@@ -3,10 +3,7 @@ import requests
 from os import getenv
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-
-CI_SCRIPTS_DIR = getenv("SHARED_CI_SCRIPTS_DIR", "/ci-scripts")
 SUBDOMAINS = ["healthcheck", "metadata"]
-
 
 class ClusterEndpointsPreCheck(unittest.TestCase):
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(5))
