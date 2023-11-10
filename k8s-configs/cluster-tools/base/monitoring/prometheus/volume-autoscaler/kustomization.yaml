@@ -6,6 +6,7 @@ resources:
 - base
 
 images:
+<<<<<<< HEAD
   - name: devopsnirvana/kubernetes-volume-autoscaler
     newName: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/kubernetes-volume-autoscaler
 
@@ -26,6 +27,14 @@ patchesStrategicMerge:
             image: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/kubernetes-volume-autoscaler:v1.0.8
 
 # # Setting up Prometheus-related environment variables
+=======
+  - name: devopsnirvana/kubernetes-volume-autoscaler:1.0.8
+    newName: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/kubernetes-volume-autoscaler:v1.0.8
+
+patchesStrategicMerge:
+
+# Setting up Prometheus-related environment variables
+>>>>>>> 38fb50372 ([skip pipeline] fix)
 - |-
   apiVersion: apps/v1
   kind: Deployment
