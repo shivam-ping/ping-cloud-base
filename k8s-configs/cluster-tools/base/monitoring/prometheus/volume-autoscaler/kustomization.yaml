@@ -28,8 +28,8 @@ patchesStrategicMerge:
 
 # # Setting up Prometheus-related environment variables
 =======
-  - name: devopsnirvana/kubernetes-volume-autoscaler:1.0.8
-    newName: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/kubernetes-volume-autoscaler:v1.0.8
+  - name: devopsnirvana/kubernetes-volume-autoscaler
+    newName: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/kubernetes-volume-autoscaler
 
 patchesStrategicMerge:
 
