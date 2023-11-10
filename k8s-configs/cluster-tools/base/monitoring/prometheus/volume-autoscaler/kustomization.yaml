@@ -11,7 +11,21 @@ images:
 
 patchesStrategicMerge:
 
-# Setting up Prometheus-related environment variables
+# Change volume-autoscaler pod's image path to Ping-managed one
+- |-
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: volume-autoscaler  
+  spec:
+    template:
+      metadata:                
+      spec:
+        containers:
+          - name: volume-autoscaler
+            image: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/kubernetes-volume-autoscaler:v1.0.8
+
+# # Setting up Prometheus-related environment variables
 - |-
   apiVersion: apps/v1
   kind: Deployment
