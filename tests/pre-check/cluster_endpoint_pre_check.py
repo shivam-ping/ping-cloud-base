@@ -11,16 +11,19 @@ class ClusterEndpointsPreCheck(unittest.TestCase):
         tenant_domain = getenv("PRIMARY_TENANT_DOMAIN", "ping-oasis.com")
 
         for subdomain in SUBDOMAINS:
-            self.get_ingress_response(subdomain, tenant_domain)
+            with self.subTest(msg=f"{subdomain} is not available"):
+                response = self.get_ingress_response(subdomain, tenant_domain)
+                self.assertEqual(response.status_code, 200)
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(5))
     def get_ingress_response(self, subdomain, tenant_domain):
         url = f"https://{subdomain}.{tenant_domain}"
         print(f"Checking URL: {url}")
+        response = None
         try:
             response = requests.get(url, verify=False, timeout=5)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
             self.fail(f"Failed to make GET request to {url}: {e}")
-
-        self.assertEqual(response.status_code, 200)
+        
+        return response
