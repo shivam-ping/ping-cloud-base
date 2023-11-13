@@ -20,10 +20,6 @@ class ClusterEndpointsPreCheck(unittest.TestCase):
         url = f"https://{subdomain}.{tenant_domain}"
         print(f"Checking URL: {url}")
         response = None
-        try:
-            response = requests.get(url, verify=False, timeout=5)
-            response.raise_for_status()
-        except requests.exceptions.RequestException as e:
-            self.fail(f"Failed to make GET request to {url}: {e}")
-        
+        response = requests.get(url, verify=False, timeout=5)
+        response.raise_for_status()        
         return response
