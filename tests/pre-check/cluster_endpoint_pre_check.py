@@ -11,7 +11,7 @@ class ClusterEndpointsPreCheck(unittest.TestCase):
         tenant_domain = getenv("PRIMARY_TENANT_DOMAIN", "ping-oasis.com")
 
         for subdomain in SUBDOMAINS:
-            with self.subTest(msg=f"{subdomain} is not available"):
+            with self.subTest(msg=f"{subdomain}.{tenant_domain} is not available"):
                 response = self.get_ingress_response(subdomain, tenant_domain)
                 self.assertEqual(response.status_code, 200)
 
