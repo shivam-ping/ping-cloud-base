@@ -6,35 +6,12 @@ resources:
 - base
 
 images:
-<<<<<<< HEAD
-  - name: devopsnirvana/kubernetes-volume-autoscaler
-    newName: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/kubernetes-volume-autoscaler
-
-patchesStrategicMerge:
-
-# Change volume-autoscaler pod's image path to Ping-managed one
-- |-
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    name: volume-autoscaler  
-  spec:
-    template:
-      metadata:                
-      spec:
-        containers:
-          - name: volume-autoscaler
-            image: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/kubernetes-volume-autoscaler:v1.0.8
-
-# # Setting up Prometheus-related environment variables
-=======
   - name: devopsnirvana/kubernetes-volume-autoscaler
     newName: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/kubernetes-volume-autoscaler
 
 patchesStrategicMerge:
 
 # Setting up Prometheus-related environment variables
->>>>>>> 38fb50372 ([skip pipeline] fix)
 - |-
   apiVersion: apps/v1
   kind: Deployment
@@ -114,3 +91,12 @@ patchesStrategicMerge:
   - kind: ServiceAccount
     name: volume-autoscaler
     namespace: prometheus
+
+# Set annotation to push metrics to Newrelic
+- |-
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: volume-autoscaler
+    annotations:
+      newrelic.io/scrape: "true"
