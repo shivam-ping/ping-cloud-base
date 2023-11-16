@@ -80,3 +80,12 @@ patchesStrategicMerge:
               requests:
                 cpu: 100m
                 memory: 50Mi
+                
+# Set annotation to push metrics to Newrelic
+- |-
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: volume-autoscaler
+    annotations:
+      newrelic.io/scrape: "true"
