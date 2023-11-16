@@ -90,6 +90,7 @@
 - Remove Grafana from ping-cloud-base image tag list
 - Remove p14c-oauth-service job and pod
 - Implemented: OpenSearch EBS gp3 Storage Class + Kubernetes-Volume-Autoscaler
+- Configured Kubernetes-volume-Autoscaler to send metrics to New Relic
 
 _Changes:_
 
@@ -220,6 +221,7 @@ _Changes:_
 - [x] PDO-6305 Set Karpenter defaultInstanceProfile via Environment Variable
 - [X] PDO-6311 Argocd pod resources spec adjusted
 - [X] PDO-6333 Implement: OpenSearch EBS gp3 Storage Class + Kubernetes-Volume-Autoscaler
+- [X] PDO-6335 Newrelic-Prometheus-Agent: Send Kubernetes-volume-Autoscaler Metrics to New Relic
 
 ### 1.18.0.0
 
