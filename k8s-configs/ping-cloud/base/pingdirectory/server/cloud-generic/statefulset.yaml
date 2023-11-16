@@ -166,7 +166,7 @@ spec:
             runAsNonRoot: true
             runAsUser: 9031
             allowPrivilegeEscalation: false
-          image: public.ecr.aws/r2h3l6e4/pingidentity/pingdirectory:2311-10.0.0.0-unreleased-amd64
+          image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/pingcloud-apps/pingdirectory:qa-test-upgrade-pd
           imagePullPolicy: Always
           ports:
             - containerPort: 1389
