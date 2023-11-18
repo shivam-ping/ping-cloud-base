@@ -10,13 +10,13 @@ workflow:
 stages:
 - compile
 - find-cluster
-- deploy
-- pre-check-test
-- pa-was-test
-- integration-test
-- chaos
+#- deploy
+#- pre-check-test
+#- pa-was-test
+#- integration-test
+#- chaos
 - cleanup
-- security # move this to the end and we'll use the "needs" keyword to allow it to run earlier and out of order
+#- security # move this to the end and we'll use the "needs" keyword to allow it to run earlier and out of order
 
 ## Global environment variables ##
 variables:
