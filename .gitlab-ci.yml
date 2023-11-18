@@ -92,17 +92,17 @@ variables:
 #     - /^.*-release-branch$/
 # ## end security stage ##
 
-# ## Find cluster stage ##
-# find-cluster:
-#   stage: find-cluster
-#   tags:
-#     - default-gitlab-runner-ping-cloud
-#   image: ${K8S_DEPLOY_TOOLS}
-#   script:
-#     - ${SHARED_CI_SCRIPTS_DIR}/k8s/deploy/find_cluster.sh
-#   artifacts:
-#     reports:
-#       dotenv: cluster.env
+## Find cluster stage ##
+find-cluster:
+  stage: find-cluster
+  tags:
+    - default-gitlab-runner-ping-cloud
+  image: ${K8S_DEPLOY_TOOLS}
+  script:
+    - ${SHARED_CI_SCRIPTS_DIR}/k8s/deploy/find_cluster.sh
+  artifacts:
+    reports:
+      dotenv: cluster.env
 
 # ## Deploy stage ##
 # deploy:
