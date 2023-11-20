@@ -95,15 +95,3 @@ patchesStrategicMerge:
               requests:
                 cpu: 100m
                 memory: 50Mi
-
-# Fix "User system:serviceaccount:prometheus:volume persistentvolumeclaims is forbidden" issue
-- |-
-  apiVersion: rbac.authorization.k8s.io/v1
-  kind: ClusterRole
-  metadata:
-    name: prometheus
-  rules:
-  - apiGroups: [""]
-    resources:
-    - persistentvolumeclaims
-    verbs: ["get", "list", "watch"]
