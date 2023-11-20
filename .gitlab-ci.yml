@@ -242,13 +242,13 @@ chaos-tests:
   dependencies:
     - find-cluster
 
-# Cleanup stage ##
-cleanup:
-  stage: cleanup
-  tags:
-    - default-gitlab-runner-ping-cloud
-  image: ${K8S_DEPLOY_TOOLS}
-  script:
-    - ${SHARED_CI_SCRIPTS_DIR}/k8s/cleanup/teardown.sh
-  dependencies:
-    - find-cluster
+# # Cleanup stage ##
+# cleanup:
+#   stage: cleanup
+#   tags:
+#     - default-gitlab-runner-ping-cloud
+#   image: ${K8S_DEPLOY_TOOLS}
+#   script:
+#     - ${SHARED_CI_SCRIPTS_DIR}/k8s/cleanup/teardown.sh
+#   dependencies:
+#     - find-cluster
