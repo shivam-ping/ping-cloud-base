@@ -26,6 +26,21 @@ patchesStrategicMerge:
               - name: "PROMETHEUS_URL"
                 value: "http://prometheus:9090"
 
+# Set SCALE_ABOVE_PERCENT variable to prevent unwanted PVCs to scale instead of annotating each of them manually
+- |-
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: volume-autoscaler  
+  spec:
+    template:           
+      spec:
+        containers:
+          - name: volume-autoscaler
+            env:
+              - name: "SCALE_ABOVE_PERCENT"
+                value: "100"
+
 # Add wait-for-prometheus initContainer to prevent volume-autoscaler from reporting metrics if Prometheus still not ready
 - |-
   apiVersion: apps/v1
@@ -80,3 +95,15 @@ patchesStrategicMerge:
               requests:
                 cpu: 100m
                 memory: 50Mi
+
+# Fix "User system:serviceaccount:prometheus:volume persistentvolumeclaims is forbidden" issue
+- |-
+  apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRole
+  metadata:
+    name: prometheus
+  rules:
+  - apiGroups: [""]
+    resources:
+    - persistentvolumeclaims
+    verbs: ["get", "list", "watch"]
