@@ -15,7 +15,7 @@ stages:
 - pa-was-test
 - integration-test
 - chaos
-- cleanup
+#- cleanup
 - security # move this to the end and we'll use the "needs" keyword to allow it to run earlier and out of order
 
 # Global environment variables ##
