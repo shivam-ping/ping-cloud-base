@@ -95,3 +95,14 @@ patchesStrategicMerge:
               requests:
                 cpu: 100m
                 memory: 50Mi
+
+# Change default ClusterRoleBinding subjects namespace to 'prometheus'
+- |-
+  apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    name: volume-autoscaler     
+  subjects:
+  - kind: ServiceAccount
+    name: volume-autoscaler
+    namespace: prometheus
