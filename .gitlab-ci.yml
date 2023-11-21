@@ -15,13 +15,13 @@ stages:
 - pa-was-test
 - integration-test
 - chaos
-#- cleanup
+- cleanup
 - security # move this to the end and we'll use the "needs" keyword to allow it to run earlier and out of order
 
 # Global environment variables ##
 variables:
   DELETE_ENV_AFTER_PIPELINE: 'true'
-  K8S_DEPLOY_TOOLS: docker.corp.pingidentity.com:5000/platform-pipeline/k8s-deploy-tools@sha256:15f0a94d1c9a899a0c22749f2d54fc76e5a2b1ffa4a62ae6e54d75599a10b02c
+  K8S_DEPLOY_TOOLS: docker.corp.pingidentity.com:5000/platform-pipeline/k8s-deploy-tools@sha256:26bc124b9e8267337f057bc86d5315f04b8326cb3812133e5585a9e51dc5d794
   SHARED_CI_SCRIPTS_DIR: "/ci-scripts"
   BRANCH_SKIP_TESTS: >
     pingaccess/08-artifact-test.sh
@@ -242,13 +242,13 @@ chaos-tests:
   dependencies:
     - find-cluster
 
-# # Cleanup stage ##
-# cleanup:
-#   stage: cleanup
-#   tags:
-#     - default-gitlab-runner-ping-cloud
-#   image: ${K8S_DEPLOY_TOOLS}
-#   script:
-#     - ${SHARED_CI_SCRIPTS_DIR}/k8s/cleanup/teardown.sh
-#   dependencies:
-#     - find-cluster
+# Cleanup stage ##
+cleanup:
+  stage: cleanup
+  tags:
+    - default-gitlab-runner-ping-cloud
+  image: ${K8S_DEPLOY_TOOLS}
+  script:
+    - ${SHARED_CI_SCRIPTS_DIR}/k8s/cleanup/teardown.sh
+  dependencies:
+    - find-cluster
