@@ -253,6 +253,7 @@ _Changes:_
 - [X] PDO-6249 Fluent-bit kubernetes filter sometimes doesn't work in CW pipeline
 - [X] PDO-6269 Fail PingDirectory backup Job if any backend fails upon running backup CLI
 - [X] PDO-6270 Fix es-cluster-warm pod doesn't recover gracefully from an AZ Failure
+- [X] PDO-6438 Allocate sufficient memory to the ingress controller
 
 ### 1.17.3.0
 
