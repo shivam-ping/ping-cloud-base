@@ -152,7 +152,7 @@ pa-was-integration-tests:
   - pingcentral
   - pingdatasync
   - common
-#  - monitoring
+  - monitoring
   - health
   - pingone
 
@@ -168,7 +168,7 @@ pa-was-integration-tests:
   - pingcloud-services
   - pingdatasync
   - common
-#  - monitoring
+  - monitoring
   - health
   - pingone
 
@@ -180,7 +180,7 @@ pa-was-integration-tests:
   - pingcloud-services
   - pingcentral
   - common
-#  - monitoring
+  - monitoring
   - health
   
 .integration-tests-base:
