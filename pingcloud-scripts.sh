@@ -54,9 +54,5 @@ pingcloud-scripts::source_script() {
         "s3://${src_bucket}/${script_name}/${version}/${script_name}.tar.gz" "${tmp_dir}/${script_name}.tar.gz"
 
     tar -xzf "${tmp_dir}/${script_name}.tar.gz" -C "${tmp_dir}"
-    if [[ ${script_name} == "bash_utils" ]]; then
-        echo "Changing cert"
-        sed -i.bak -e "/cmctl check/ s|^#*|#|g" "${tmp_dir}/${script_name}.sh"
-    fi
     source "${tmp_dir}/${script_name}.sh"
 }
