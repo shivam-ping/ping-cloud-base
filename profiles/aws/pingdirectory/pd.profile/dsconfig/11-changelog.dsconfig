@@ -5,3 +5,7 @@ dsconfig set-backend-prop \
     --backend-name changelog \
     --set enabled:true \
     --set "changelog-maximum-age:${CHANGELOG_SYNC_MAX_AGE}"
+
+dsconfig set-plugin-prop \
+     --plugin-name "Changelog Password Encryption" \
+     --set enabled:true
