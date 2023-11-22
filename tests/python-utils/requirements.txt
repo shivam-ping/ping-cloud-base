@@ -2,7 +2,7 @@
 pytest==7.1.2
 
 # Web browser testing
-seleniumbase==2.5.4
+#seleniumbase==2.5.4
 
 # AWS Boto3 library
 boto3~=1.25.0
