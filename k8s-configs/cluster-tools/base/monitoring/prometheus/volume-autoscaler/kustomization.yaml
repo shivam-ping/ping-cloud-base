@@ -40,6 +40,8 @@ patchesStrategicMerge:
             env:
               - name: "SCALE_ABOVE_PERCENT"
                 value: "100"
+              - name: "SCALE_UP_PERCENT"
+                value: "0"
 
 # Add wait-for-prometheus initContainer to prevent volume-autoscaler from reporting metrics if Prometheus still not ready
 - |-
