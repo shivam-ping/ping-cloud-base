@@ -26,22 +26,22 @@ patchesStrategicMerge:
               - name: "PROMETHEUS_URL"
                 value: "http://prometheus:9090"
 
-# Set SCALE_ABOVE_PERCENT variable to prevent unwanted PVCs to scale instead of annotating each of them manually
-- |-
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    name: volume-autoscaler  
-  spec:
-    template:           
-      spec:
-        containers:
-          - name: volume-autoscaler
-            env:
-              - name: "SCALE_ABOVE_PERCENT"
-                value: "100"
-              - name: "SCALE_UP_PERCENT"
-                value: "0"
+# # Set SCALE_ABOVE_PERCENT variable to prevent unwanted PVCs to scale instead of annotating each of them manually
+# - |-
+#   apiVersion: apps/v1
+#   kind: Deployment
+#   metadata:
+#     name: volume-autoscaler  
+#   spec:
+#     template:           
+#       spec:
+#         containers:
+#           - name: volume-autoscaler
+#             env:
+#               - name: "SCALE_ABOVE_PERCENT"
+#                 value: "100"
+#               - name: "SCALE_UP_PERCENT"
+#                 value: "0"
 
 # Add wait-for-prometheus initContainer to prevent volume-autoscaler from reporting metrics if Prometheus still not ready
 - |-
