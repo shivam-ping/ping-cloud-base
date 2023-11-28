@@ -21,7 +21,7 @@ stages:
 # Global environment variables ##
 variables:
   DELETE_ENV_AFTER_PIPELINE: 'true'
-  K8S_DEPLOY_TOOLS: docker.corp.pingidentity.com:5000/platform-pipeline/k8s-deploy-tools@sha256:621b3d7672f285c11ded68efad61c7886076d07476aa6c343aa36081f270a641
+  K8S_DEPLOY_TOOLS: docker.corp.pingidentity.com:5000/platform-pipeline/k8s-deploy-tools:v1.19-release-branch
   SHARED_CI_SCRIPTS_DIR: "/ci-scripts"
   BRANCH_SKIP_TESTS: >
     pingaccess/08-artifact-test.sh
@@ -29,7 +29,7 @@ variables:
     pingdirectory/03-backup-restore.sh
     pingdirectory/08-test-http-connection-handler.sh
 
-# Compile stage ##
+## Compile stage ##
 compile:
  stage: compile
  tags:
@@ -92,7 +92,7 @@ scan:
     - /^.*-release-branch$/
 ## end security stage ##
 
-# Find cluster stage ##
+## Find cluster stage ##
 find-cluster:
   stage: find-cluster
   tags:
@@ -242,7 +242,7 @@ chaos-tests:
   dependencies:
     - find-cluster
 
-# Cleanup stage ##
+## Cleanup stage ##
 cleanup:
   stage: cleanup
   tags:
