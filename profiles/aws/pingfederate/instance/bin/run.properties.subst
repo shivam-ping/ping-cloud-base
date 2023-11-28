@@ -474,8 +474,8 @@ pf.tls.admin.server.protocols=TLSv1.2,TLSv1.3
 # Please refer to the performance tuning guide for further tuning guidance.
 pf.admin.threads.min=${PF_JETTY_THREADS_MIN}
 pf.admin.threads.max=${PF_JETTY_THREADS_MAX}
-pf.runtime.threads.min=${PF_JETTY_THREADS_MIN}
-pf.runtime.threads.max=${PF_JETTY_THREADS_MAX}
+pf.runtime.threads.min=${PF_RUN_PF_RUNTIME_THREADS_MIN}
+pf.runtime.threads.max=${PF_RUN_PF_RUNTIME_THREADS_MAX}
 
 #   HTTP Connector Queue Size Settings
 #   ----------------------------------

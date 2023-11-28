@@ -82,3 +82,12 @@ JAVA_AGENT_OPTS=-javaagent:/opt/staging/jmx_prometheus_javaagent-0.14.0.jar=8080
 PF_PROVISIONER_GRACE_PERIOD=600
 # Synchronization frequency in seconds (default: 60)
 PF_PROVISIONER_SYNC_FREQ=60
+
+# The following will set PingFederate the minimum and the maximum
+# number of threads used to configure PingFederate thread pools.
+# By default this was designed to be empty and the P1AS automation will
+# dynamically set based on the CPU of the pod. Only override these 4 variables if you truly want to set yourself.
+PF_RUN_PF_RUNTIME_THREADS_MIN=
+PF_JETTY_THREADS_MIN=
+PF_RUN_PF_RUNTIME_THREADS_MAX=
+PF_JETTY_THREADS_MAX=

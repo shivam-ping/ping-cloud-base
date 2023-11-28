@@ -3,7 +3,12 @@ LAST_UPDATE_REASON="${LAST_UPDATE_REASON}"
 
 SERVER_PROFILE_PATH=profiles/pingfederate
 
-PF_JETTY_THREADS_MIN=
+# The following will set PingFederate the minimum and the maximum
+# number of threads used to configure PingFederate thread pools.
+# By default this was designed to be empty and the P1AS automation will
+# dynamically set based on the CPU of the pod. Only override these 4 variables if you truly want to set yourself.
 PF_RUN_PF_RUNTIME_THREADS_MIN=
-PF_JETTY_THREADS_MAX=
+PF_JETTY_THREADS_MIN=${PF_RUN_PF_RUNTIME_THREADS_MIN}
+
 PF_RUN_PF_RUNTIME_THREADS_MAX=
+PF_JETTY_THREADS_MAX=${PF_RUN_PF_RUNTIME_THREADS_MAX}
