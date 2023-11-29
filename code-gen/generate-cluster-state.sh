@@ -1334,8 +1334,7 @@ for ENV_OR_BRANCH in ${SUPPORTED_ENVIRONMENT_TYPES}; do
     # Add IS_BELUGA_ENV to the base values.yaml
     substitute_vars "${ENV_DIR}/values-files" '${IS_BELUGA_ENV}'
 
-
-  #Resetting to empty string , once versent is done https://pingidentity.atlassian.net/browse/PP-5719 and will remove this code as per PDO-5136
+    # Resetting to empty string , once versent is done https://pingidentity.atlassian.net/browse/PP-5719 and will remove this code as per PDO-5136
     export IRSA_PING_ANNOTATION_KEY_VALUE=""
     export IRSA_PA_ANNOTATION_KEY_VALUE=""
     export IRSA_PD_ANNOTATION_KEY_VALUE=""
