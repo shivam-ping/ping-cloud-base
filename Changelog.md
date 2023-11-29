@@ -92,9 +92,13 @@
 - Remove PingDirectory Pass-Through Authentication secrets and plugin
 - Remove prime-thread-count setting from userRoot backend within PingDirectory
 - Implemented: OpenSearch EBS gp3 Storage Class + Kubernetes-Volume-Autoscaler
+<<<<<<< HEAD
 - Allow CSR to override the duration and renewBefore properties within cert-manager
 - Updating image-map.sh to include CHART_MAP variable. 
 - Logstash: Migrate to AWS EBS gp3 Volumes
+=======
+- Configured Kubernetes-volume-Autoscaler to send metrics to New Relic
+>>>>>>> 51c9fdf6b (update changelog)
 
 _Changes:_
 
@@ -229,8 +233,12 @@ _Changes:_
 - [X] PDO-6311 Argocd pod resources spec adjusted
 - [X] PDO-6323 Allow CSR to override the duration and renewBefore properties within cert-manager
 - [X] PDO-6333 Implement: OpenSearch EBS gp3 Storage Class + Kubernetes-Volume-Autoscaler
+<<<<<<< HEAD
 - [X] PDO-6337 Migrate logstash to the GP3 volumes
 - [X] PDO-6420 Update tag-release.sh to replace the helm chart versions in PCB
+=======
+- [X] PDO-6335 Newrelic-Prometheus-Agent: Send Kubernetes-volume-Autoscaler Metrics to New Relic
+>>>>>>> 51c9fdf6b (update changelog)
 
 ### 1.18.0.0
 
