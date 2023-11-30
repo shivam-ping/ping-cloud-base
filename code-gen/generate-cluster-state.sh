@@ -102,6 +102,9 @@
 #                                  |                                                    |
 # CLUSTER_STATE_REPO_URL           | The URL of the cluster-state repo.                 | https://github.com/pingidentity/ping-cloud-base
 #                                  |                                                    |
+# DEFAULT_CLUSTER_UPTIME           | The cluster default uptime used by kube-downscaler | Mon-Fri 09:00-:18:00 UTC
+#                                  | to downscale resource outside workhours            |
+#                                  |                                                    |
 # ENVIRONMENTS                     | The environments the customer is entitled to. This | dev test stage prod customer-hub
 #                                  | will be a subset of SUPPORTED_ENVIRONMENT_TYPES    |
 #                                  |                                                    |
@@ -411,6 +414,7 @@ ${MYSQL_DATABASE}
 ${CLUSTER_NAME}
 ${CLUSTER_NAME_LC}
 ${CLUSTER_ENDPOINT}
+${DEFAULT_CLUSTER_UPTIME}
 ${KARPENTER_INSTANCE_PROFILE}
 ${DNS_ZONE}
 ${VALUES_FILES_DNS_ZONE}
@@ -736,6 +740,7 @@ echo "Initial NLB_NGX_PUBLIC_ANNOTATION_KEY_VALUE: ${NLB_NGX_PUBLIC_ANNOTATION_K
 echo "Initial CLUSTER_ENDPOINT: ${CLUSTER_ENDPOINT}"
 echo "Initial KARPENTER_INSTANCE_PROFILE: ${KARPENTER_INSTANCE_PROFILE}"
 echo "Initial KARPENTER_CONTROLLER_IAM_ROLE: ${KARPENTER_CONTROLLER_IAM_ROLE}"
+echo "Initial DEFAULT_CLUSTER_UPTIME: ${DEFAULT_CLUSTER_UPTIME}"
 
 echo "Initial SLACK_CHANNEL: ${SLACK_CHANNEL}"
 echo "Initial NON_GA_SLACK_CHANNEL: ${NON_GA_SLACK_CHANNEL}"
@@ -850,6 +855,7 @@ export IRSA_INGRESS_ANNOTATION_KEY_VALUE=${IRSA_INGRESS_ANNOTATION_KEY_VALUE:-''
 export CLUSTER_ENDPOINT=${CLUSTER_ENDPOINT:-''}
 export KARPENTER_INSTANCE_PROFILE=${KARPENTER_INSTANCE_PROFILE:-"KarpenterInstanceProfile"}
 export KARPENTER_CONTROLLER_IAM_ROLE=${KARPENTER_CONTROLLER_IAM_ROLE:-"KarpenterControllerRole"}
+export DEFAULT_CLUSTER_UPTIME=${DEFAULT_CLUSTER_UPTIME:-"Mon-Fri 09:00-:18:00 UTC"}
 
 export KARPENTER_ROLE_ANNOTATION_KEY_VALUE=${KARPENTER_ROLE_ANNOTATION_KEY_VALUE:-''}
 
