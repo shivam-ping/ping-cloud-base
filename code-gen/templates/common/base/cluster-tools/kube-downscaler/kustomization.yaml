@@ -6,8 +6,9 @@ resources:
 
 configMapGenerator:
 - name: kube-downscaler
-  disableNameSuffixHash: true
   behavior: merge
+  options:
+    disableNameSuffixHash: true
   literals:
     - DEFAULT_UPTIME=${DEFAULT_CLUSTER_UPTIME}
 
