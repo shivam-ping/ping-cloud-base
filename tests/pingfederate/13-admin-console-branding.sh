@@ -26,9 +26,6 @@ testPFAdminConsoleBrandingValues() {
   header_bar=$(kubectl exec pingfederate-admin-0 -n "${PING_CLOUD_NAMESPACE}" -c pingfederate-admin -- sh -c \
               "grep pf.console.environment /opt/out/instance/bin/run.properties")
   test "${header_bar}" = "${expected}"
-  if [ -n ${PFA_PORT_FORWARD_PROCESS_ID} ]; then
-    kill -9 ${PFA_PORT_FORWARD_PROCESS_ID}
-  fi
   assertEquals "The PingFederate Admin Console Header Bar was ${header_bar} but expected ${expected}" 0 $?
 
 }
