@@ -11,10 +11,6 @@ fi
 # Verify that the PF Admin Console Contains PingOne Branding
 # Both in the Tab Tile and Header
 testPFAdminConsoleBrandingValues() {
-  if [[ $cluster_name != ci-cd* ]]; then
-    kubectl port-forward -n ping-cloud service/pingfederate-admin 9999:9999 > /dev/null 2>&1 &
-    PFA_PORT_FORWARD_PROCESS_ID=$!
-  fi
 
   expected="pf.console.title=Advanced SSO"
   title=$(kubectl exec pingfederate-admin-0 -n "${PING_CLOUD_NAMESPACE}" -c pingfederate-admin -- sh -c \
