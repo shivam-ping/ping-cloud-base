@@ -10,11 +10,6 @@ fi
 
 testLdap() {
   log "Using the hostname: ${PINGDIRECTORY_ADMIN} and port: ${PD_SEED_LDAPS_PORT}"
-  if [[ $cluster_name != ci-cd* ]]; then
-    kubectl port-forward -n ping-cloud service/pingdirectory-admin ${PD_SEED_LDAPS_PORT}:636 > /dev/null 2>&1 &
-    PDA_PORT_FORWARD_PROCESS_ID=$!
-  fi
-  
   if test "${IS_BELUGA_ENV}" = 'true' && test "${CI_SERVER}" != "yes"; then
     log "Running process grep and ldapsearch..."
     if pgrep -f docker > /dev/null; then
@@ -44,10 +39,7 @@ testLdap() {
       --baseDN "cn=config" \
       --searchScope base "(&)" 1.1
   fi
-  
-  if [ -n ${PDA_PORT_FORWARD_PROCESS_ID} ]; then
-    kill -9 ${PDA_PORT_FORWARD_PROCESS_ID}
-  fi
+
   assertEquals 0 ${?}
 }
 
