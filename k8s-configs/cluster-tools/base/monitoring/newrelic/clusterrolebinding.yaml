@@ -84,9 +84,9 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: nri-bundle-nri-metadata-injection-admission
-  annotations:
-    "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  #annotations:
+#    "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
+#    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     app.kubernetes.io/instance: nri-bundle
     app.kubernetes.io/managed-by: Helm
