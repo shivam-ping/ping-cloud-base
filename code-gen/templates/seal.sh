@@ -122,6 +122,20 @@ for FILE in ${YAML_FILES}; do
   NAME=$(grep '^  name:' "${FILE}" | cut -d: -f2 | tr -d '[:space:]')
   NAMESPACE=$(grep '^  namespace:' "${FILE}" | cut -d: -f2 | tr -d '[:space:]')
 
+# Added annotation to all the SealedSecret’s so generated secrets doesn’t report as outOf sync   
+  cat >> "${SEALED_SECRETS_FILE}" <<EOF
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: ${NAME}
+  namespace: ${NAMESPACE}
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+
+---
+
+EOF
+
   # Only seal secrets that have data in them.
   if grep '^data' "${FILE}" &> /dev/null; then
     echo "Creating sealed secret for \"${NAMESPACE}:${NAME}\""
