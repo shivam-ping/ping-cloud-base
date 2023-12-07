@@ -7,7 +7,7 @@ apiVersion: v1
 metadata:
   name: newrelic
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: "-2"
 ---
 # Source: p1as-newrelic/charts/nri-bundle/charts/newrelic-infrastructure/templates/controlplane/serviceaccount.yaml
 apiVersion: v1
