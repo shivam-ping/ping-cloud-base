@@ -121,6 +121,12 @@ testPingDelegatorImageTag() {
 }
 
 testPingCentralImageTag() {
+  if [[ $CLUSTER_NAME != ci-cd* ]]; then
+    if [ "${ENV_TYPE}" != "customer-hub" ]; then
+      echo "Skipping testPingCentralImageTag test as ENV_TYPE is not customer-hub"
+      return
+    fi
+  fi
   if [ "${ENV_TYPE}" != "customer-hub" ] && [ "${CI_PIPELINE_SOURCE}" == "schedule" ]; then
     log "Detected CDE deploy that does not contain PingCentral.  Skipping test"
     return 0
