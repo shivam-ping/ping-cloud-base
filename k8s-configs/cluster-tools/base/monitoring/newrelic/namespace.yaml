@@ -2,5 +2,5 @@ kind: Namespace
 apiVersion: v1
 metadata:
   name: newrelic
-#  annotations:
-#    argocd.argoproj.io/sync-wave: "-1"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
