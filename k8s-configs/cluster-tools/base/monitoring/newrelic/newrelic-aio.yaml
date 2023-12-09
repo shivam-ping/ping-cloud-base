@@ -1528,9 +1528,9 @@ kind: ServiceAccount
 metadata:
   name: nri-bundle-nri-metadata-injection-admission
   namespace: newrelic
-  # annotations:
-  #   "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
-  #   "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     app: nri-metadata-injection-admission
     app.kubernetes.io/instance: nri-bundle
@@ -1544,9 +1544,9 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: nri-bundle-nri-metadata-injection-admission
-  # annotations:
-  #   "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
-  #   "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     app: nri-metadata-injection-admission
     app.kubernetes.io/instance: nri-bundle
@@ -1568,9 +1568,9 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: nri-bundle-nri-metadata-injection-admission
-  # annotations:
-  #   "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
-  #   "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     app.kubernetes.io/instance: nri-bundle
     app.kubernetes.io/managed-by: Helm
@@ -1593,9 +1593,9 @@ kind: Role
 metadata:
   name: nri-bundle-nri-metadata-injection-admission
   namespace: newrelic
-  # annotations:
-  #   "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
-  #   "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     app: nri-metadata-injection-admission
     app.kubernetes.io/instance: nri-bundle
@@ -1618,9 +1618,9 @@ kind: RoleBinding
 metadata:
   name: nri-bundle-nri-metadata-injection-admission
   namespace: newrelic
-  # annotations:
-  #   "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
-  #   "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade,post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     app: nri-metadata-injection-admission
     app.kubernetes.io/instance: nri-bundle
@@ -1643,9 +1643,9 @@ kind: Job
 metadata:
   name: nri-bundle-nri-metadata-injection-admission-create
   namespace: newrelic
-  # annotations:
-  #   "helm.sh/hook": pre-install,pre-upgrade
-  #   "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     app: nri-metadata-injection-admission-create
     app.kubernetes.io/instance: nri-bundle
@@ -1689,9 +1689,9 @@ kind: Job
 metadata:
   name: nri-bundle-nri-metadata-injection-admission-patch
   namespace: newrelic
-  # annotations:
-  #   "helm.sh/hook": post-install,post-upgrade
-  #   "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     app: nri-metadata-injection-admission-patch
     app.kubernetes.io/instance: nri-bundle

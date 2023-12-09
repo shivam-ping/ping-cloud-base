@@ -16,3 +16,14 @@ resources:
   - secret.yaml
   - role.yaml
   - rolebinding.yaml
+
+patches:
+  - target:
+      kind: ClusterRole
+      name: nri-bundle-nri-metadata-injection-admission
+    patch: |
+      - op: remove
+        path: /metadata/annotations/helm.sh/hook
+      - op: remove
+        path: /metadata/annotations/helm.sh/hook-delete-policy
+      
