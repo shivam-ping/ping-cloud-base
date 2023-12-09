@@ -83,7 +83,7 @@ patches:
 
   - target:
       kind: ServiceAccount
-      name: nri-bundle-nri-metadata-injection-admission-patch
+      name: nri-bundle-nri-metadata-injection-admission
     patch: |
       - op: remove
         path: /metadata/annotations/helm.sh~1hook
