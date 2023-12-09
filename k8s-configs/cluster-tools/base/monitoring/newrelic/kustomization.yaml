@@ -23,7 +23,7 @@ patches:
       name: nri-bundle-nri-metadata-injection-admission
     patch: |
       - op: remove
-        path: /metadata/annotations/helm.sh/hook
+        path: /metadata/annotations/helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
       - op: remove
-        path: /metadata/annotations/helm.sh/hook-delete-policy
+        path: /metadata/annotations/helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
       
