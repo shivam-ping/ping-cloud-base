@@ -32,11 +32,9 @@ getMatchedTagCount() {
 }
 
 testPingAccessImageTag() {
-  if [[ $CLUSTER_NAME != ci-cd* ]]; then
-    if [ "${ENV_TYPE}" == "customer-hub" ]; then
-      echo "Skipping testPingAccessImageTag as ENV_TYPE is customer-hub"
-      return
-    fi
+  if [ "${ENV_TYPE}" == "customer-hub" ]; then
+    echo "Skipping testPingAccessImageTag as ENV_TYPE is customer-hub"
+    return
   fi
   $(test "${PINGACCESS_IMAGE_TAG}")
   assertEquals "PINGACCESS_IMAGE_TAG missing from env_vars file" 0 $?
@@ -70,11 +68,9 @@ testPingAccessWASImageTag() {
 }
 
 testPingFederateImageTag() {
-  if [[ $CLUSTER_NAME != ci-cd* ]]; then
-    if [ "${ENV_TYPE}" == "customer-hub" ]; then
-      echo "Skipping testPingFederateImageTag as ENV_TYPE is customer-hub"
-      return
-    fi
+  if [ "${ENV_TYPE}" == "customer-hub" ]; then
+    echo "Skipping testPingFederateImageTag as ENV_TYPE is customer-hub"
+    return
   fi
   $(test "${PINGFEDERATE_IMAGE_TAG}")
   assertEquals "PINGFEDERATE_IMAGE_TAG missing from env_vars file" 0 $?
@@ -87,11 +83,9 @@ testPingFederateImageTag() {
 }
 
 testPingDirectoryImageTag() {
-  if [[ $CLUSTER_NAME != ci-cd* ]]; then
-    if [ "${ENV_TYPE}" == "customer-hub" ]; then
-      echo "Skipping testPingDirectoryImageTag as ENV_TYPE is customer-hub"
-      return
-    fi
+  if [ "${ENV_TYPE}" == "customer-hub" ]; then
+    echo "Skipping testPingDirectoryImageTag as ENV_TYPE is customer-hub"
+    return
   fi
   $(test "${PINGDIRECTORY_IMAGE_TAG}")
   assertEquals "PINGDIRECTORY_IMAGE_TAG missing from env_vars file" 0 $?
@@ -104,11 +98,9 @@ testPingDirectoryImageTag() {
 }
 
 testPingDelegatorImageTag() {
-  if [[ $CLUSTER_NAME != ci-cd* ]]; then
-    if [ "${ENV_TYPE}" == "customer-hub" ]; then
-      echo "Skipping testPingDelegatorImageTag as ENV_TYPE is customer-hub"
-      return
-    fi
+  if [ "${ENV_TYPE}" == "customer-hub" ]; then
+    echo "Skipping testPingDelegatorImageTag as ENV_TYPE is customer-hub"
+    return
   fi
   $(test "${PINGDELEGATOR_IMAGE_TAG}")
   assertEquals "PINGDELEGATOR_IMAGE_TAG missing from env_vars file" 0 $?
@@ -121,11 +113,9 @@ testPingDelegatorImageTag() {
 }
 
 testPingCentralImageTag() {
-  if [[ $CLUSTER_NAME != ci-cd* ]]; then
-    if [ "${ENV_TYPE}" != "customer-hub" ]; then
-      echo "Skipping testPingCentralImageTag test as ENV_TYPE is not customer-hub"
-      return
-    fi
+  if [ "${ENV_TYPE}" != "customer-hub" ]; then
+    echo "Skipping testPingCentralImageTag test as ENV_TYPE is not customer-hub"
+    return
   fi
   if [ "${ENV_TYPE}" != "customer-hub" ] && [ "${CI_PIPELINE_SOURCE}" == "schedule" ]; then
     log "Detected CDE deploy that does not contain PingCentral.  Skipping test"
@@ -164,11 +154,9 @@ testBootstrapImageTag() {
 }
 
 testP14CIntegrationImageTag() {
-  if [[ $CLUSTER_NAME != ci-cd* ]]; then
-    if [ "${ENV_TYPE}" == "customer-hub" ]; then
-      echo "Skipping testP14CIntegrationImageTag as ENV_TYPE is customer-hub"
-      return
-    fi
+  if [ "${ENV_TYPE}" == "customer-hub" ]; then
+    echo "Skipping testP14CIntegrationImageTag as ENV_TYPE is customer-hub"
+    return
   fi
   $(test "${P14C_INTEGRATION_IMAGE_TAG}")
   assertEquals "P14C_INTEGRATION_IMAGE_TAG missing from env_vars file" 0 $?
