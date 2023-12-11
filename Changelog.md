@@ -98,6 +98,7 @@
 - Update CreateCluster script to provision Karpenter-ready Cluster.
 - Removed: AWS EFS CSI Driver
 - Prometheus: Migrate to AWS EBS gp3 Volumes
+- Update `pingcloud-service` tests to be able to run locally
 
 _Changes:_
 
@@ -216,6 +217,7 @@ _Changes:_
 - [X] PDO-6077 Multiple issues with OpenSearch connect from secondary region
 - [X] PDO-6124 Add Request and Limit resources to PingAccess/PingAccess-WAS Upgrade Init Container
 - [X] PDO-6106 Test using Helm dependency tags
+- [X] PDO-6127 Update integration tests to be able to run locally
 - [X] PDO-6136 Fix common integration tests
 - [X] PDO-6138 Kube-downscaler excluding grafana deployment from downscaling
 - [X] PDO-6166 Add PingFederate periodic backup limits
