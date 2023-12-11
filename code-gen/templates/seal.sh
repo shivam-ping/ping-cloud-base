@@ -113,21 +113,24 @@ echo "Using certificate file ${CERT_FILE} for encrypting secrets"
 SEALED_SECRETS_FILE=/tmp/sealed-secrets.yaml
 rm -f "${SEALED_SECRETS_FILE}"
 
-# Create default secret file under /tmp. This is required so that ping-secrets.yaml can override secrets.yaml
 SECRETS_FILE=/tmp/ping-secrets.yaml
 rm -f "${SECRETS_FILE}"
-touch "${SECRETS_FILE}"
 
 for FILE in ${YAML_FILES}; do
   NAME=$(grep '^  name:' "${FILE}" | cut -d: -f2 | tr -d '[:space:]')
   NAMESPACE=$(grep '^  namespace:' "${FILE}" | cut -d: -f2 | tr -d '[:space:]')
 
-  # Temporary file
-  tmp_file="tmp.yaml"
-  # Add argocd.argoproj.io/compare-options: IgnoreExtraneous to annotations
-  awk '/annotations:/ { inside_annotations=1 } /^[[:blank:]]*[^[:blank:]#]/ && inside_annotations { $0 = $0 "\n    argocd.argoproj.io/compare-options: IgnoreExtraneous"; inside_annotations=0 } 1' "$FILE" > "$tmp_file"
-  # Replace the original file with the modified one
-  mv "$tmp_file" "$FILE"
+  cat >> "${SECRETS_FILE}" <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${NAME}
+  namespace: ${NAMESPACE}
+\$patch: delete
+
+---
+
+EOF
 
   # Only seal secrets that have data in them.
   if grep '^data' "${FILE}" &> /dev/null; then
@@ -158,7 +161,7 @@ else
   echo "      test -f ${SECRETS_FILE} && cp ${SECRETS_FILE} ${BUILD_DIR}/secrets.yaml"
   echo "      test -f ${SEALED_SECRETS_FILE} && cp ${SEALED_SECRETS_FILE} ${BUILD_DIR}/sealed-secrets.yaml"
   echo "      ./git-ops-command.sh \${REGION_DIR} > /tmp/deploy.yaml"
-  echo "      grep 'kind: Secret' /tmp/deploy.yaml # should have Secrets manifests & ConfigMap manifests"
+  echo "      grep 'kind: Secret' /tmp/deploy.yaml # shouldn't have Secrets manifests, but could have ConfigMap manifests"
   echo "      grep 'kind: SealedSecret' /tmp/deploy.yaml # should have hits"
   echo "- Push all modified files into the cluster state repo"
   echo "- Run this script for each CDE branch and region directory in the order - dev, test, stage, prod"
