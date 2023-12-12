@@ -125,7 +125,6 @@ testPingCentralImageTag() {
   else
     log "Detected CDE deploy that does not contain PingCentral.  Skipping test"
   fi
-  
 }
 
 testMetadataImageTag() {
