@@ -113,7 +113,7 @@ testPingDelegatorImageTag() {
 }
 
 testPingCentralImageTag() {
-  if [ $ENV_TYPE = 'customer-hub' ] || { [ "${ENV_TYPE}" == "dev" ] && [ "${CI_PIPELINE_SOURCE}" == "schedule" ]; }; then
+  if [ $ENV_TYPE = 'customer-hub' ] || { [[ $CLUSTER_NAME == ci-cd* ]] && [ "${ENV_TYPE}" == "dev" ] && [ "${CI_PIPELINE_SOURCE}" != "schedule" ]; }; then
     $(test "${PINGCENTRAL_IMAGE_TAG}")
     assertEquals "PINGCENTRAL_IMAGE_TAG missing from env_vars file" 0 $?
 
@@ -122,8 +122,16 @@ testPingCentralImageTag() {
 
     matched_count=$(getMatchedTagCount "${PINGCENTRAL_IMAGE_TAG}" "pingcentral")
     assertEquals "PingCentral CSR image tag doesn't match Beluga default image tag" 1 "${matched_count}"
+
+    log "${CLUSTER_NAME}"
+    log "${ENV_TYPE}"
+    log "${CI_PIPELINE_SOURCE}"
+    
   else
     log "Detected CDE deploy that does not contain PingCentral.  Skipping test"
+    log "${CLUSTER_NAME}"
+    log "${ENV_TYPE}"
+    log "${CI_PIPELINE_SOURCE}"
   fi
 }
 
