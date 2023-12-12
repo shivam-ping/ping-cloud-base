@@ -122,6 +122,13 @@ for FILE in ${YAML_FILES}; do
   NAME=$(grep '^  name:' "${FILE}" | cut -d: -f2 | tr -d '[:space:]')
   NAMESPACE=$(grep '^  namespace:' "${FILE}" | cut -d: -f2 | tr -d '[:space:]')
 
+  # Temporary file
+  tmp_file="tmp.yaml"
+  # Add argocd.argoproj.io/compare-options: IgnoreExtraneous to annotations
+  awk '/annotations:/ { inside_annotations=1 } /^[[:blank:]]*[^[:blank:]#]/ && inside_annotations { $0 = $0 "\n    argocd.argoproj.io/compare-options: IgnoreExtraneous"; inside_annotations=0 } 1' "$FILE" > "$tmp_file"
+  # Replace the original file with the modified one
+  mv "$tmp_file" "$FILE"
+
   # Only seal secrets that have data in them.
   if grep '^data' "${FILE}" &> /dev/null; then
     echo "Creating sealed secret for \"${NAMESPACE}:${NAME}\""
