@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pingdirectory
+spec:
+  podSelector:
+    matchLabels:
+      class: pingdirectory-server
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        # Insert secondary region CIDR here
+        #- ipBlock:
+            #cidr: 172.17.0.0/16
+        # Allow PD pods to talk to themselves
+        - podSelector:
+            matchLabels:
+              class: pingdirectory-server
+      ports:
+        # LDAPS
+        - protocol: TCP
+          port: 1636
+        # LDAP
+        - protocol: TCP
+          port: 1389
+        # Replication
+        - protocol: TCP
+          port: 8989
