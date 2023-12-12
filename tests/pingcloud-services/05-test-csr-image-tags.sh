@@ -122,17 +122,10 @@ testPingCentralImageTag() {
 
     matched_count=$(getMatchedTagCount "${PINGCENTRAL_IMAGE_TAG}" "pingcentral")
     assertEquals "PingCentral CSR image tag doesn't match Beluga default image tag" 1 "${matched_count}"
-
-    log "${CLUSTER_NAME}"
-    log "${ENV_TYPE}"
-    log "${CI_PIPELINE_SOURCE}"
-    
   else
     log "Detected CDE deploy that does not contain PingCentral.  Skipping test"
-    log "${CLUSTER_NAME}"
-    log "${ENV_TYPE}"
-    log "${CI_PIPELINE_SOURCE}"
   fi
+  
 }
 
 testMetadataImageTag() {
