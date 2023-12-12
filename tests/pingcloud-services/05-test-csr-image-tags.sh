@@ -113,22 +113,18 @@ testPingDelegatorImageTag() {
 }
 
 testPingCentralImageTag() {
-  if [ "${ENV_TYPE}" != "customer-hub" ]; then
-    echo "Skipping testPingCentralImageTag test as ENV_TYPE is not customer-hub"
-    return
-  fi
-  if [ "${ENV_TYPE}" != "customer-hub" ] && [ "${CI_PIPELINE_SOURCE}" == "schedule" ]; then
+  if [ $ENV_TYPE = 'customer-hub' ] || { [ "${ENV_TYPE}" == "dev" ] && [ "${CI_PIPELINE_SOURCE}" == "schedule" ]; }; then
+    $(test "${PINGCENTRAL_IMAGE_TAG}")
+    assertEquals "PINGCENTRAL_IMAGE_TAG missing from env_vars file" 0 $?
+
+    unique_count=$(getUniqueTagCount "pingcentral")
+    assertEquals "PingCentral is using multiple image tag versions" 1 "${unique_count}"
+
+    matched_count=$(getMatchedTagCount "${PINGCENTRAL_IMAGE_TAG}" "pingcentral")
+    assertEquals "PingCentral CSR image tag doesn't match Beluga default image tag" 1 "${matched_count}"
+  else
     log "Detected CDE deploy that does not contain PingCentral.  Skipping test"
-    return 0
   fi
-  $(test "${PINGCENTRAL_IMAGE_TAG}")
-  assertEquals "PINGCENTRAL_IMAGE_TAG missing from env_vars file" 0 $?
-
-  unique_count=$(getUniqueTagCount "pingcentral")
-  assertEquals "PingCentral is using multiple image tag versions" 1 "${unique_count}"
-
-  matched_count=$(getMatchedTagCount "${PINGCENTRAL_IMAGE_TAG}" "pingcentral")
-  assertEquals "PingCentral CSR image tag doesn't match Beluga default image tag" 1 "${matched_count}"
 }
 
 testMetadataImageTag() {
