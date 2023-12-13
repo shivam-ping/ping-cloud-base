@@ -17,9 +17,15 @@ spec:
         - podSelector:
             matchLabels:
               class: pingdirectory-server
+        # For pf-admin we don't want the commonLabels from PD's kustomization.yaml, so we select it a different way
+        # https://github.com/kubernetes-sigs/kustomize/issues/2034#issuecomment-618482375
+        # We could use `labels:` but then our selectors would change for production customers, potentially causing disruption
         - podSelector:
-            matchLabels:
-              role: pingfederate-admin
+            matchExpressions:
+              - key: role
+                operator: In
+                values:
+                  - pingfederate-admin
       ports:
         # LDAPS
         - protocol: TCP
