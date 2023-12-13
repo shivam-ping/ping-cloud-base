@@ -9,11 +9,8 @@ To run tests in this directory locally follow the below steps:
 - export SHARED_CI_SCRIPTS_DIR=<path to k8s-deploy-tools repo>/ci-scripts
 - export PROJECT_DIR=<path to this repo root>
 - export ENV_TYPE=<your environment name (dev test stage prod customer-hub)>
-
-# This list of tests has to be skipped for now
-# monitoring/test_cloudwatch_logs.py is skipped because CloudWatch logs are disabled for all dev clusters (PDO-5762)
-# pingaccess/08-artifact-test.sh pingdelegator/01-admin-user-login.sh pingdirectory/03-backup-restore.sh pingdirectory/08-test-http-connection-handler.sh are skipped locally as well as in ci-cd pipeline as they require some fixes.
-- export SKIP_TESTS="monitoring/test_cloudwatch_logs.py pingaccess/08-artifact-test.sh pingdelegator/01-admin-user-login.sh pingdirectory/03-backup-restore.sh pingdirectory/08-test-http-connection-handler.sh"
+# This list of tests has to be skipped for now as they require some fixes.
+- export SKIP_TESTS=<tests set in repo gitlab-ci.yml (BRANCH_SKIP_TESTS)>
 
 - run `${SHARED_CI_SCRIPTS_DIR}/test/run-tests.sh <INSERT TEST DIRECTORY> <PATH TO PROPERTIES FILE>`
 
