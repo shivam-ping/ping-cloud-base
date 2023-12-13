@@ -17,6 +17,9 @@ spec:
         - podSelector:
             matchLabels:
               class: pingdirectory-server
+        - podSelector:
+            matchLabels:
+              role: pingfederate-admin
       ports:
         # LDAPS
         - protocol: TCP
