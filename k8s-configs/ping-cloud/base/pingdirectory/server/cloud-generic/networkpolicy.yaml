@@ -26,6 +26,7 @@ spec:
                 operator: In
                 values:
                   - pingfederate-admin
+                  - pingfederate-engine
       ports:
         # LDAPS
         - protocol: TCP
