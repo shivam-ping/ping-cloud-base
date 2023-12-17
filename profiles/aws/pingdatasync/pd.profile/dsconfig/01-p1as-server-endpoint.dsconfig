@@ -6,6 +6,10 @@ dsconfig set-trust-manager-provider-prop \
   --provider-name "JVM-Default" \
   --set enabled:true
 
+dsconfig set-trust-manager-provider-prop \
+  --provider-name "Blind Trust" \
+  --set enabled:true
+
 dsconfig create-external-server \
   --server-name external_p1as_pd_server \
   --set "server-host-name:${P1AS_PD_POD_NAME}.${P1AS_PD_CLUSTER_PRIVATE_HOSTNAME}" \
