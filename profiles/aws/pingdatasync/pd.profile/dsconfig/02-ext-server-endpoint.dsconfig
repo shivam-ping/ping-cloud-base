@@ -1,6 +1,11 @@
 #
 # Create external PD server endpoint
 #
+
+dsconfig set-trust-manager-provider-prop \
+  --provider-name "Blind Trust" \
+  --set enabled:true
+
 dsconfig create-external-server \
   --server-name external_pd_server \
   --set "server-host-name:${EXT_PD_HOST}" \
