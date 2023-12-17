@@ -13,6 +13,7 @@ dsconfig create-root-dn-user \
     --user-name "pingdatasync"  \
     --set "alternate-bind-dn:${SYNC_BIND_DN}"  \
     --set alternate-bind-dn:cn=datasync  \
+    --set privilege:bypass-acl  \
     --set inherit-default-root-privileges:false  \
     --set privilege:bypass-pw-policy  \
     --set privilege:config-read  \
