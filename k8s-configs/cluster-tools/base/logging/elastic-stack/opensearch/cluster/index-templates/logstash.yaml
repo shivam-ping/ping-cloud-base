@@ -1,0 +1,68 @@
+apiVersion: opensearch.opster.io/v1
+kind: OpensearchIndexTemplate
+metadata:
+  name: logstash
+spec:
+  opensearchCluster:
+    name: opensearch-cluster
+  name: logstash # name of the index template - defaults to metadata.name. Can't be updated in-place
+  indexPatterns: # required index patterns
+    - "logstash-*"
+  composedOf: []
+  priority: 100
+  template:
+    settings:
+      index.unassigned.node_left.delayed_timeout: 10m
+      index.number_of_shards: '3'
+      index.number_of_replicas: '1'
+      index.refresh_interval: 30s
+      index:
+        routing:
+          allocation:
+            require:
+              temp: hot
+    mappings:
+      dynamic_templates:
+        - message_field:
+            path_match: message
+            mapping:
+              norms: false
+              type: text
+            match_mapping_type: string
+        - string_fields:
+            mapping:
+              norms: false
+              fields:
+                keyword:
+                  ignore_above: 256
+                  type: keyword
+              type: text
+            match_mapping_type: string
+            match: "*"
+      date_detection: false
+      properties:
+        "@timestamp":
+          type: date
+        geoip:
+          dynamic: 'true'
+          properties:
+            ip:
+              type: ip
+            latitude:
+              type: half_float
+            location:
+              type: geo_point
+            longitude:
+              type: half_float
+        "@version":
+          type: keyword
+        timestamp:
+          type: text
+        cluster_name:
+          type: text
+          fields:
+            keyword:
+              type: keyword
+              ignore_above: 256
+  version: 1 # optional
+  _meta: {} # optional

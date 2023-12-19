@@ -1,0 +1,35 @@
+apiVersion: opensearch.opster.io/v1
+kind: OpensearchIndexTemplate
+metadata:
+  name: general
+spec:
+  opensearchCluster:
+    name: opensearch-cluster
+  name: general # name of the index template - defaults to metadata.name. Can't be updated in-place
+  indexPatterns: # required index patterns
+    - "*"
+  composedOf: []
+  priority: 0
+  template:
+    settings:
+      index.unassigned.node_left.delayed_timeout: 15m
+      index.number_of_shards: '1'
+      index.number_of_replicas: '1'
+      index.refresh_interval: 30s
+      index:
+        routing:
+          allocation:
+            require:
+              temp: hot
+    mappings:
+      properties:
+        "@timestamp":
+          type: date
+        cluster_name:
+          type: text
+          fields:
+            keyword:
+              type: keyword
+              ignore_above: 256
+  version: 1 # optional
+  _meta: {} # optional

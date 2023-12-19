@@ -1,0 +1,126 @@
+apiVersion: opensearch.opster.io/v1
+kind: OpenSearchCluster
+metadata:
+  name: opensearch-cluster
+spec:
+  security:
+    tls: # Instead of certmanager certificates we can generate certificates here
+      transport:
+        generate: true
+      http:
+        generate: true
+    config:
+      securityConfigSecret:
+        name: opensearch-securityconfig # attach security config fropm original OS
+      adminCredentialsSecret:
+        name: opensearch-admin-config # CM name where we store username and password for OS operator connection
+  general:
+    serviceName: opensearch-cluster
+    version: 2.8.0
+    pluginsList: # We use custom OS docker image, also, we can add plugins in this way
+      - "repository-s3"
+      - "https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/releases/download/2.8.0.0/prometheus-exporter-2.8.0.0.zip"
+    image: public.ecr.aws/r2h3l6e4/pingcloud-monitoring/opensearch/dev:v1.19-release-branch-latest
+    additionalConfig: # we can convert current OS config to the adiitionalConfig
+      cluster.max_shards_per_node: "10000"
+      node.search.cache.size: "500mb"
+  dashboards:
+    enable: true
+    opensearchCredentialsSecret:
+      name: opensearch-dashboards-admin-config
+    image: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/opensearchproject/opensearch-dashboards:2.8.0
+    version: 2.8.0
+    replicas: 1
+    resources:
+      requests:
+         memory: "512Mi"
+         cpu: "200m"
+      limits:
+         memory: "512Mi"
+         cpu: "200m"
+  nodePools:
+    - component: hot
+      replicas: 3
+      additionalConfig:
+        node.attr.temp: "hot"
+      diskSize: "10Gi"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+                labelSelector:
+                  matchExpressions:
+                    - key: opster.io/opensearch-nodepool
+                      operator: In
+                      values:
+                        - hot
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: opster.io/opensearch-nodepool
+                    operator: In
+                    values:
+                      - hot
+              topologyKey: kubernetes.io/hostname
+      persistence:
+        pvc:
+          storageClass: opensearch-gp3
+          accessModes:
+            - ReadWriteOnce
+      nodeSelector:
+      resources:
+        requests:
+          cpu: "1"
+          memory: 4Gi
+        limits:
+          cpu: "4"
+          memory: 4Gi
+      roles:
+        - "cluster_manager"
+        - "data"
+        - "ingest"
+        - "remote_cluster_client"
+        - "search"
+    - component: warm
+      replicas: 3
+      diskSize: "150Gi"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+                labelSelector:
+                  matchExpressions:
+                    - key: opster.io/opensearch-nodepool
+                      operator: In
+                      values:
+                        - warm
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: opster.io/opensearch-nodepool
+                    operator: In
+                    values:
+                      - warm
+              topologyKey: kubernetes.io/hostname
+      additionalConfig:
+        node.attr.temp: "warm"
+      persistence:
+        pvc:
+          storageClass: opensearch-sc1
+          accessModes:
+            - ReadWriteOnce
+      nodeSelector:
+      resources:
+        requests:
+          cpu: "1"
+          memory: 4Gi
+        limits:
+          cpu: "2"
+          memory: 4Gi
+      roles:
+        - "remote_cluster_client"
+        - "data"
