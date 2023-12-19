@@ -27,7 +27,7 @@ spec:
           - --matching-labels=.*
           #- --debug
           - --include-resources=deployments,statefulsets,cronjobs
-          - --exclude-namespaces=karpenter,kube-system,default
+          - --exclude-namespaces=karpenter,default
           - --exclude-deployments=coredns
           # run every minute
           - --interval=300
