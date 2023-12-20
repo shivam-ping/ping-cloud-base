@@ -29,6 +29,7 @@ spec:
           - --include-resources=deployments,statefulsets,cronjobs
           - --exclude-namespaces=karpenter
           - --exclude-deployments=coredns,kube-downscaler
+          - --grace-period=120
           # run every minute
           - --interval=300
         envFrom:
