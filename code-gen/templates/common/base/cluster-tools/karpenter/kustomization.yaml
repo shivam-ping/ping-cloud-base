@@ -24,6 +24,8 @@ patchesStrategicMerge:
               value: "${CLUSTER_NAME}"
             - name: CLUSTER_ENDPOINT
               value: "${CLUSTER_ENDPOINT}"
+            - name: DISABLE_WEBHOOK
+              value: "true"
 - |-
   apiVersion: v1
   kind: ServiceAccount

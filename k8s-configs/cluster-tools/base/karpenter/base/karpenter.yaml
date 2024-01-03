@@ -397,6 +397,8 @@ spec:
               value: ${CLUSTER_NAME}
             - name: CLUSTER_ENDPOINT
               value: ${CLUSTER_ENDPOINT}
+            - name: DISABLE_WEBHOOK
+              value: "false"
           ports:
             - name: http-metrics
               containerPort: 8000
