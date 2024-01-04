@@ -23,13 +23,14 @@ configMapGenerator:
 
 
 # Point to the ping-cluster-tools repo equivalents pushed to ECR
-images:
-- name: quay.io/argoproj/argocd
-  newName: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/argo/argocd
-- name: redis
-  newName: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/redis
-- name: ghcr.io/dexidp/dex
-  newName: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/dexidp/dex
+# TODO: comment out but will need to push these versions before opening MR
+# images:
+# - name: quay.io/argoproj/argocd
+#   newName: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/argo/argocd
+# - name: redis
+#   newName: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/redis
+# - name: ghcr.io/dexidp/dex
+#   newName: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/dexidp/dex
 
 patches:
 - path: argo-notifications-cm.yaml
@@ -261,7 +262,8 @@ patches:
           - name: git-ops-command
             command: [/var/run/argocd/argocd-cmp-server] # Entrypoint should be Argo CD lightweight CMP server i.e. argocd-cmp-server
             # We don't need to use the full ArgoCD image here but we use it for consistency sake when installing all of the tools for both containers.
-            image: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/argo/argocd:v2.8.3
+            # TODO: change to proper ECR image
+            image: quay.io/argoproj/argocd:v2.9.3
             securityContext:
               runAsNonRoot: true
               runAsUser: 999
