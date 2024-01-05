@@ -50,7 +50,7 @@ API_RETRY_LIMIT=15
 API_TIMEOUT_WAIT=10
 
 # Default external to example.com, this will be need to be overridden by the customer.
-EXT_PD_HOST=add6b928065fd468788ea08260c24581-be6925bf685653e9.elb.us-west-2.amazonaws.com
+EXT_PD_HOST=a3f3e6cef755b4593819abf8280e984f-ac3d46b6f28b39b6.elb.us-west-2.amazonaws.com
 EXT_PD_LDAPS_PORT=1636
 EXT_PD_LDAP_PORT=1389
 EXT_PD_HTTPS_PORT=1443
