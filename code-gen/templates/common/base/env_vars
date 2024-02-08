@@ -161,8 +161,8 @@ PING_IDENTITY_DEVOPS_KEY=${PING_IDENTITY_DEVOPS_KEY}
 ############################################################
 # Ping application image tags
 ############################################################
-PINGACCESS_IMAGE_TAG=v1.18-release-branch-latest
-PINGACCESS_WAS_IMAGE_TAG=v1.18-release-branch-latest
+PINGACCESS_IMAGE_TAG=PDO-6602-hc-ff
+PINGACCESS_WAS_IMAGE_TAG=PDO-6602-hc-ff
 PINGFEDERATE_IMAGE_TAG=v1.18-release-branch-latest
 PINGDIRECTORY_IMAGE_TAG=v1.18-release-branch-latest
 PINGDELEGATOR_IMAGE_TAG=v1.18-release-branch-latest
