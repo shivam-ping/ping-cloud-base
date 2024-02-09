@@ -114,6 +114,9 @@
 #                                  |                                                    | default to "global.poc.ping.com" for
 #                                  |                                                    | tenant domain "us1.poc.ping.cloud".
 #                                  |                                                    |
+# HEALTHCHECKS_ENABLED             | Feature Flag - Indicates if healthcheck deployment | false
+#                                  | pods are enabled. Set to "true" to enable          |
+#                                  |                                                    |
 # IRSA_ARGOCD_ANNOTATION_KEY_VALUE | The IRSA annotation to add to ArgoCD resources     | eks.amazonaws.com/role-arn: arn:aws:iam::SOME_ACCOUNT_ID:role/SOME_ROLE
 #                                  |                                                    |
 # IS_BELUGA_ENV                    | An optional flag that may be provided to indicate  | false. Only intended for Beluga
