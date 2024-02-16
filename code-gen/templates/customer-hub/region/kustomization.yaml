@@ -28,8 +28,8 @@ patchesStrategicMerge:
 #   - comment the other patches
 #   - set HEALTHCHECKS_ENABLED=true in base/env_vars
 
-- ../base/cluster-tools/health/disable-all-healthchecks.yaml
-#- ../base/cluster-tools/health/chub-healthchecks-primary-region-patch.yaml
+#- ../base/cluster-tools/health/disable-all-healthchecks.yaml
+- ../base/cluster-tools/health/chub-healthchecks-primary-region-patch.yaml
 #- ../base/cluster-tools/health/chub-healthchecks-child-region-patch.yaml
 
 

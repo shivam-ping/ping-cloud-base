@@ -219,7 +219,7 @@ patchesStrategicMerge:
 #   - set HEALTHCHECKS_ENABLED=true in base/env_vars
 #   - re-spin pa and pa-was admin pods when argocd syncs these changes
 
-- ../base/cluster-tools/health/disable-all-healthchecks.yaml
+#- ../base/cluster-tools/health/disable-all-healthchecks.yaml
 
 ### MANUAL UPDATES SECTION - END
 
