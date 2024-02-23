@@ -67,7 +67,9 @@ class ConsoleUILoginTestBase(unittest.TestCase):
         # Ignore certificate error warning page from chrome
         options.add_argument("--ignore-ssl-errors=yes")
         options.add_argument("--ignore-certificate-errors")
-        options.add_argument("--headless=new")
+        options.add_argument("--headless=new")  # run in headless mode in CICD
+        options.add_argument("--no-sandbox")  # run in Docker
+        options.add_argument("--disable-dev-shm-usage")  # run in Docker
         self.browser = webdriver.Chrome(options=options)
         self.addCleanup(self.browser.quit)
 
