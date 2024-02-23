@@ -9,7 +9,7 @@ chromedriver-autoinstaller
 boto3~=1.25.0
 
 # PingOne shared scripts
-git+https://gitlab.corp.pingidentity.com/ping-cloud-private-tenant/ping-cloud-tools.git@master#subdirectory=pingone
+git+https://gitlab.corp.pingidentity.com/ping-cloud-private-tenant/ping-cloud-tools.git@PDO-3523-pa-test#subdirectory=pingone
 
 ruamel.yaml==0.17.26
 
