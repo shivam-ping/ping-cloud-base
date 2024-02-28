@@ -22,8 +22,10 @@ class TestPAAdminUILogin(p1_ui.ConsoleUILoginTestBase):
         )
 
     def test_user_can_access_pa_admin_console(self):
-        self.pingone_login()
+        # Wait for admin console to be reachable if it has been restarted by another test
+        self.wait_until_url_is_reachable(self.public_hostname)
         # Attempt to access the PingAccess Admin console with SSO
+        self.pingone_login()
         self.browser.get(self.public_hostname)
         self.browser.implicitly_wait(10)
         try:
