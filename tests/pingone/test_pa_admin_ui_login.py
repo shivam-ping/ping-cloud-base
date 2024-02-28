@@ -18,7 +18,7 @@ class TestPAAdminUILogin(p1_ui.ConsoleUILoginTestBase):
         super().setUpClass()
         cls.public_hostname = os.getenv(
             "PA_ADMIN_PUBLIC_HOSTNAME",
-            f"https://pingaccess-admin.{os.environ['BELUGA_ENV_NAME']}.{os.environ['TENANT_DOMAIN']}",
+            f"https://pingaccess-admin.{os.environ['TENANT_DOMAIN']}",
         )
 
     def test_user_can_access_pa_admin_console(self):
