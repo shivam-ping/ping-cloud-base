@@ -43,7 +43,7 @@ class ConsoleUILoginTestBase(unittest.TestCase):
         super().setUpClass()
         chromedriver_autoinstaller.install()
         cls.tenant_name = os.getenv("TENANT_NAME")
-        cls.environment = os.getenv("ENVIRONMENT")
+        cls.environment = os.getenv("ENV", "dev")
         cls.username = f"sso-test-user-{cls.tenant_name}"
         cls.password = "2FederateM0re!"
         cls.group_names = [
