@@ -1,10 +1,13 @@
 import json
+import logging
 import os
 import unittest
 
 import boto3
 import chromedriver_autoinstaller
+import requests
 import requests_oauthlib
+import tenacity
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
@@ -20,6 +23,9 @@ ENV_METADATA_PARAM = SSM.get_parameter(
 ENV_METADATA = json.loads(ENV_METADATA_PARAM.get("Parameter").get("Value"))
 ENV_ID = ENV_METADATA.get("pingOneInformation").get("environmentId")
 ENV_UI_URL = f"https://console-staging.pingone.com/?env={ENV_ID}#home?nav=home"
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 class ConsoleUILoginTestBase(unittest.TestCase):
@@ -160,6 +166,19 @@ class ConsoleUILoginTestBase(unittest.TestCase):
             self.browser.find_element(
                 By.CSS_SELECTOR, '[aria-label="Close modal window"]'
             ).click()
+
+    @tenacity.retry(
+        reraise=True,
+        wait=tenacity.wait_fixed(5),
+        before_sleep=tenacity.before_sleep_log(logger, logging.INFO),
+        stop=tenacity.stop_after_attempt(100),
+    )
+    def wait_until_url_is_reachable(self, admin_console_url: str):
+        try:
+            response = requests.get(admin_console_url, allow_redirects=True, verify=False)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError:
+            raise
 
     def test_user_can_log_in_to_pingone(self):
         self.pingone_login()
