@@ -1,15 +1,19 @@
 import json
 import logging
 import os
+import ssl
 import unittest
 
 import boto3
 import chromedriver_autoinstaller
 import requests
 import requests_oauthlib
-import tenacity
+import selenium.common.exceptions
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+import tenacity
+import urllib3
+import warnings
 
 from pingone import common as p1_utils
 
@@ -160,12 +164,16 @@ class ConsoleUILoginTestBase(unittest.TestCase):
         ).click()
         # Wait for post-login screen
         self.browser.implicitly_wait(10)
-        if self.browser.find_element(
-            By.CSS_SELECTOR, "[aria-label=verify-email-modal]"
-        ):
-            self.browser.find_element(
-                By.CSS_SELECTOR, '[aria-label="Close modal window"]'
-            ).click()
+        try:
+            # Handle verify email pop-up when presented
+            if self.browser.find_element(
+                By.CSS_SELECTOR, "[aria-label=verify-email-modal]"
+            ):
+                self.browser.find_element(
+                    By.CSS_SELECTOR, '[aria-label="Close modal window"]'
+                ).click()
+        except selenium.common.exceptions.NoSuchElementException:
+            pass
 
     @tenacity.retry(
         reraise=True,
@@ -175,8 +183,14 @@ class ConsoleUILoginTestBase(unittest.TestCase):
     )
     def wait_until_url_is_reachable(self, admin_console_url: str):
         try:
-            response = requests.get(admin_console_url, allow_redirects=True, verify=False)
+            warnings.filterwarnings(
+                "ignore", category=urllib3.exceptions.InsecureRequestWarning
+            )
+            response = requests.get(
+                admin_console_url, allow_redirects=True, verify=False
+            )
             response.raise_for_status()
+            warnings.resetwarnings()
         except requests.exceptions.HTTPError:
             raise
 
@@ -184,9 +198,15 @@ class ConsoleUILoginTestBase(unittest.TestCase):
         self.pingone_login()
         self.browser.implicitly_wait(10)
         # The content iframe on the home page displays the list of environments, have to switch or selenium can't see it
-        iframe = self.browser.find_element(By.ID, "content-iframe")
-        self.browser.switch_to.frame(iframe)
-        title = self.browser.find_element(
-            By.XPATH, "//div[contains(text(), 'Your Environments')]"
-        )
-        self.assertTrue(title.is_displayed())
+
+        try:
+            iframe = self.browser.find_element(By.ID, "content-iframe")
+            self.browser.switch_to.frame(iframe)
+            title = self.browser.find_element(
+                By.XPATH, "//div[contains(text(), 'Your Environments')]"
+            )
+            self.assertTrue(title.is_displayed())
+        except selenium.common.exceptions.NoSuchElementException:
+            self.fail(
+                f"PingOne console 'Your Environments' page was not displayed when attempting to access {self.ENV_UI_URL}. Browser contents: {self.browser.page_source}"
+            )

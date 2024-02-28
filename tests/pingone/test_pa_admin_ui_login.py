@@ -36,11 +36,11 @@ class TestPAAdminUILogin(p1_ui.ConsoleUILoginTestBase):
             wait.until(lambda t: title.is_displayed())
             self.assertTrue(
                 title.is_displayed(),
-                f"PingAccess Admin console 'Applications' page was not displayed when attempting to access {self.public_hostname}. SSO may have failed. {self.browser.page_source}",
+                f"PingAccess Admin console 'Applications' page was not displayed when attempting to access {self.public_hostname}. SSO may have failed. Browser contents: {self.browser.page_source}",
             )
         except NoSuchElementException:
             self.fail(
-                f"PingAccess Admin console 'Applications' page was not displayed when attempting to access {self.public_hostname}. SSO may have failed. {self.browser.page_source}",
+                f"PingAccess Admin console 'Applications' page was not displayed when attempting to access {self.public_hostname}. SSO may have failed. Browser contents: {self.browser.page_source}",
             )
 
 
