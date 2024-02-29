@@ -49,13 +49,6 @@ class ConsoleUILoginTestBase(unittest.TestCase):
         cls.environment = os.getenv("ENV", "dev")
         cls.username = f"sso-test-user-{cls.tenant_name}"
         cls.password = "2FederateM0re!"
-        cls.group_names = [
-            "argo-pingbeluga",
-            "os-ping",
-            f"{cls.tenant_name}-{cls.environment}-pa-admin",
-            f"{cls.tenant_name}-{cls.environment}-pf-roleadmin",
-            cls.tenant_name,
-        ]
         cls.p1_client = p1_utils.get_client()
         cls.p1_session = requests_oauthlib.OAuth2Session(
             cls.p1_client["client_id"], token=cls.p1_client["token"]
@@ -85,11 +78,9 @@ class ConsoleUILoginTestBase(unittest.TestCase):
     @classmethod
     def create_pingone_user(cls):
         """
-        Get group IDs for dev/cicd
         Get population ID for dev/cicd
         Create a user in population
         Add role to user
-        Add groups to user
         """
 
         population_id = p1_utils.get_population_id(
@@ -120,14 +111,6 @@ class ConsoleUILoginTestBase(unittest.TestCase):
             role_name="Identity Data Read Only",
             environment_id=ENV_ID,
         )
-
-        for group in cls.group_names:
-            p1_utils.add_group_to_user(
-                token_session=cls.p1_session,
-                endpoints=cls.p1_environment_endpoints,
-                user_name=cls.username,
-                group_name=group,
-            )
 
     @classmethod
     def delete_pingone_user(cls):
