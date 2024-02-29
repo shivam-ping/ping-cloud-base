@@ -5,6 +5,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
+from pingone import common as p1_utils
 import pingone_ui as p1_ui
 
 
@@ -20,6 +21,17 @@ class TestPAAdminUILogin(p1_ui.ConsoleUILoginTestBase):
             "PA_ADMIN_PUBLIC_HOSTNAME",
             f"https://pingaccess-admin.{os.environ['TENANT_DOMAIN']}",
         )
+        cls.group_names = [
+            f"{cls.tenant_name}-{cls.environment}-pa-admin",
+            cls.tenant_name,
+        ]
+        for group in cls.group_names:
+            p1_utils.add_group_to_user(
+                token_session=cls.p1_session,
+                endpoints=cls.p1_environment_endpoints,
+                user_name=cls.username,
+                group_name=group,
+            )
 
     def test_user_can_access_pa_admin_console(self):
         # Wait for admin console to be reachable if it has been restarted by another test
