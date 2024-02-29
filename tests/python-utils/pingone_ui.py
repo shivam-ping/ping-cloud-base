@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import ssl
 import unittest
 
 import boto3
@@ -95,19 +94,9 @@ class ConsoleUILoginTestBase(unittest.TestCase):
 
         population_id = p1_utils.get_population_id(
             token_session=cls.p1_session,
-            endpoint=cls.p1_environment_endpoints.populations,
+            endpoints=cls.p1_environment_endpoints,
             name=cls.tenant_name,
         )
-
-        groups = {}
-        for group in cls.group_names:
-            group_id = p1_utils.get_group_id(
-                token_session=cls.p1_session,
-                endpoint=cls.p1_environment_endpoints.groups,
-                group_name=group,
-            )
-            if group_id:
-                groups[group] = group_id
 
         user_payload = {
             "email": "do-not-reply@pingidentity.com",
@@ -117,39 +106,34 @@ class ConsoleUILoginTestBase(unittest.TestCase):
             "password": {"value": cls.password, "forceChange": "false"},
         }
 
-        user_id = p1_utils.create_user(
+        p1_utils.create_user(
             token_session=cls.p1_session,
-            endpoint=f'{cls.p1_environment_endpoints.users}?filter=username sw "{cls.username}"',
+            endpoints=cls.p1_environment_endpoints,
             name=cls.username,
             payload=user_payload,
         )
 
-        identity_data_read_only_role_id = p1_utils.get_role_id(
-            token_session=cls.p1_session,
-            endpoint=cls.p1_environment_endpoints.roles,
-            name="Identity Data Read Only",
-        )
-
         p1_utils.add_role_to_user(
             token_session=cls.p1_session,
-            endpoint=cls.p1_environment_endpoints.users,
-            user_id=user_id,
-            role_id=identity_data_read_only_role_id,
+            endpoints=cls.p1_environment_endpoints,
+            user_name=cls.username,
+            role_name="Identity Data Read Only",
             environment_id=ENV_ID,
         )
 
-        p1_utils.add_groups_to_user(
-            token_session=cls.p1_session,
-            endpoint=cls.p1_environment_endpoints.users,
-            user_id=user_id,
-            group_ids=list(groups.values()),
-        )
+        for group in cls.group_names:
+            p1_utils.add_group_to_user(
+                token_session=cls.p1_session,
+                endpoints=cls.p1_environment_endpoints,
+                user_name=cls.username,
+                group_name=group,
+            )
 
     @classmethod
     def delete_pingone_user(cls):
         p1_utils.delete_user(
             token_session=cls.p1_session,
-            endpoint=cls.p1_environment_endpoints.users,
+            endpoints=cls.p1_environment_endpoints,
             name=cls.username,
         )
 
