@@ -3,7 +3,6 @@ import logging
 import os
 import unittest
 
-import boto3
 import chromedriver_autoinstaller
 import requests
 import requests_oauthlib
@@ -14,16 +13,13 @@ import tenacity
 import urllib3
 import warnings
 
+import k8s_utils
 from pingone import common as p1_utils
 
 USER = os.getenv("USER")
-SSM = boto3.client("ssm")
-ENV_METADATA_PARAM_NAME = f"{os.getenv('CUSTOMER_SSO_SSM_PATH_PREFIX', f'{USER}/pcpt/customer/sso')}/environment-metadata"
-
-ENV_METADATA_PARAM = SSM.get_parameter(
-    Name=ENV_METADATA_PARAM_NAME, WithDecryption=False
-)
-ENV_METADATA = json.loads(ENV_METADATA_PARAM.get("Parameter").get("Value"))
+K8S = k8s_utils.K8sUtils()
+ENV_METADATA_CM = K8S.get_configmap_values(namespace="ping-cloud", configmap_name="p14c-environment-metadata")
+ENV_METADATA = json.loads(ENV_METADATA_CM.get("information.json"))
 ENV_ID = ENV_METADATA.get("pingOneInformation").get("environmentId")
 ENV_UI_URL = f"https://console-staging.pingone.com/?env={ENV_ID}#home?nav=home"
 
@@ -146,7 +142,7 @@ class ConsoleUILoginTestBase(unittest.TestCase):
         reraise=True,
         wait=tenacity.wait_fixed(5),
         before_sleep=tenacity.before_sleep_log(logger, logging.INFO),
-        stop=tenacity.stop_after_attempt(100),
+        stop=tenacity.stop_after_attempt(60),
     )
     def wait_until_url_is_reachable(self, admin_console_url: str):
         try:
