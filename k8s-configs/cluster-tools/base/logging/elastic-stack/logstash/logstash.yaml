@@ -5,6 +5,7 @@ metadata:
   name: nr-license-key
   annotations:
     sealedsecrets.bitnami.com/managed: "true"
+    argocd.argoproj.io/sync-options: Prune=false
 
 ---
 apiVersion: apps/v1
@@ -25,7 +26,22 @@ spec:
       labels:
         app: logstash-elastic
     spec:
+      securityContext:
+        fsGroup: 1000
       serviceAccountName: logstash-elastic
+      affinity:
+        podAntiAffinity:
+          # Add a soft requirement for each Logstash pod to be deployed to a different AZ
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - logstash-elastic
+                topologyKey: "topology.kubernetes.io/zone"
       initContainers:
         - name: wait-for-bootstrap-completed
           securityContext:
@@ -115,7 +131,7 @@ spec:
             - name: QUEUE_TYPE
               value: persisted
             - name: QUEUE_MAX_BYTES
-              value: 1000gb
+              value: 10gb
             - name: QUEUE_DRAIN
               value: "true"
             - name: DEAD_LETTER_QUEUE_ENABLE
@@ -177,6 +193,14 @@ spec:
             periodSeconds: 10
             successThreshold: 3
             timeoutSeconds: 5
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /
+              port: 8080
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
           resources:
             limits:
               cpu: "500m"
@@ -228,11 +252,9 @@ spec:
             - name: enrichment-cache-files
               mountPath: /enrichment-cache-files
               readOnly: false
-            - name: logstash-efs
+            - name: logstash-gp3
               mountPath: /usr/share/logstash/data/queue
               readOnly: false
-            - name: os-certs
-              mountPath: /usr/share/logstash/certs
         # Sidecar enrichment container which updates Logstash dictionaries
         - name: enrichment-sidecar
           securityContext:
@@ -299,23 +321,22 @@ spec:
             name: enrichment-cache
         - name: enrichment-cache-files
           emptyDir: {}
-        - name: os-certs
-          secret:
-            secretName: opensearch-cert
   serviceName: logstash-elastic
   volumeClaimTemplates:
     - metadata:
-        name: logstash-efs
+        name: logstash-gp3
+        annotations:
+          volume.autoscaler.kubernetes.io/scale-above-percent: "85"
+          volume.autoscaler.kubernetes.io/scale-up-percent: "25"
         labels:
           app: logstash-elastic
       spec:
         accessModes:
           - ReadWriteOnce
-        storageClassName: efs
+        storageClassName: logstash-gp3
         resources:
           requests:
-            storage: 1Mi
-
+            storage: 50Gi
 
 ---
 kind: Service
@@ -389,13 +410,3 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: logstash-elastic
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: os-logstash-creds
-  annotations:
-    sealedsecrets.bitnami.com/managed: "true"
-data:
-  username: bG9nc3Rhc2g=
-  password: bWk3ZWl0ZTJvb25vbzhFa3UxdWZvbzRlZ2gxamFpajI=

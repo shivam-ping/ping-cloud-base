@@ -1,9 +1,12 @@
 # For more information on prometheus configuration go to https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: prometheus
   namespace: prometheus
+  labels:
+    app: prometheus
 spec:
   serviceName: prometheus
   replicas: 1
@@ -16,6 +19,11 @@ spec:
         app: prometheus
     spec:
       serviceAccountName: prometheus
+      securityContext:
+        fsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
       containers:
       - name: prometheus
         image: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/prom/prometheus:v2.47.0
@@ -63,14 +71,17 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: prometheus-storage-volume
+      annotations:
+        volume.autoscaler.kubernetes.io/scale-above-percent: "80"
+        volume.autoscaler.kubernetes.io/scale-up-percent: "20"
       labels:
         app: prometheus
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: efs
+      storageClassName: prometheus-gp3
       resources:
         requests:
-          storage: 1Mi
+          storage: 30Gi
 
 ---
 

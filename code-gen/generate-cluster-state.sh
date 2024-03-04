@@ -102,6 +102,9 @@
 #                                  |                                                    |
 # CLUSTER_STATE_REPO_URL           | The URL of the cluster-state repo.                 | https://github.com/pingidentity/ping-cloud-base
 #                                  |                                                    |
+# DEFAULT_CLUSTER_UPTIME           | The cluster default uptime used by kube-downscaler | Mon-Fri 09:00-:18:00 UTC
+#                                  | to downscale resource outside workhours            |
+#                                  |                                                    |
 # ENVIRONMENTS                     | The environments the customer is entitled to. This | dev test stage prod customer-hub
 #                                  | will be a subset of SUPPORTED_ENVIRONMENT_TYPES    |
 #                                  |                                                    |
@@ -142,9 +145,6 @@
 # IS_MULTI_CLUSTER                 | Flag indicating whether or not this is a           | false
 #                                  | multi-cluster deployment.                          |
 #                                  |                                                    |
-# IS_MY_PING                       | A flag indicating whether or not this is a MyPing  | The SSM path: /pcpt/customer/sso/is-myping
-#                                  | customer.                                          |
-#                                  |                                                    |
 # K8S_GIT_BRANCH                   | The Git branch within the above Git URL.           | The git branch where this script
 #                                  |                                                    | exists, i.e. CI_COMMIT_REF_NAME
 #                                  |                                                    |
@@ -152,6 +152,9 @@
 #                                  |                                                    |
 # KARPENTER_INSTANCE_PROFILE       | Karpenter Instance profile attached to EKS Clsuter | KarpenterInstanceProfile
 #                                  | IAM Node role                                      |
+#                                  |                                                    |
+# KARPENTER_CONTROLLER_IAM_ROLE    | IAM role that the Karpenter controller will use to | KarpenterControllerRole
+#                                  | provision new instances                            |
 #                                  |                                                    |
 # LOG_ARCHIVE_URL                  | The URL of the log archives. If provided, logs are | The string "unused".
 #                                  | periodically captured and sent to this URL. For    |
@@ -220,11 +223,7 @@
 # PRIMARY_TENANT_DOMAIN            | In multi-cluster environments, the primary domain. | Same as TENANT_DOMAIN.
 #                                  | Only used if IS_MULTI_CLUSTER is true.             |
 #                                  |                                                    |
-# PROM_NOTIFICATION_ENABLED        | Flag indicating if PGO alerts should be sent to    | False
-#                                  | the endpoint configured in the argo-events         |
-#                                  |                                                    |
-# PROM_SLACK_CHANNEL               | The Slack channel name for PGO argo-events to send | CDE environment: p1as-application-oncall
-#                                  | notification.                                      |
+# OPSGENIE_API_KEY                 | API key for OpsGenie to send alerts from Prometheus| PLACEHOLDER
 #                                  |                                                    |
 # RADIUS_PROXY_ENABLED             | Feature Flag - Indicates if the radius proxy       | False
 #                                  | feature for PingFederate engines is enabled        |
@@ -411,13 +410,13 @@ ${MYSQL_DATABASE}
 ${CLUSTER_NAME}
 ${CLUSTER_NAME_LC}
 ${CLUSTER_ENDPOINT}
+${DEFAULT_CLUSTER_UPTIME}
 ${KARPENTER_INSTANCE_PROFILE}
 ${DNS_ZONE}
 ${VALUES_FILES_DNS_ZONE}
 ${DNS_ZONE_DERIVED}
 ${PRIMARY_DNS_ZONE}
 ${PRIMARY_DNS_ZONE_DERIVED}
-${METADATA_IMAGE_TAG}
 ${BOOTSTRAP_IMAGE_TAG}
 ${P14C_INTEGRATION_IMAGE_TAG}
 ${ANSIBLE_BELUGA_IMAGE_TAG}
@@ -434,6 +433,8 @@ ${IRSA_PF_ANNOTATION_KEY_VALUE}
 ${IRSA_ARGOCD_ANNOTATION_KEY_VALUE}
 ${IRSA_INGRESS_ANNOTATION_KEY_VALUE}
 ${IRSA_CWAGENT_ANNOTATION_KEY_VALUE}
+${IRSA_LOGSTASH_ANNOTATION_KEY_VALUE}
+${IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE}
 ${IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE}
 ${IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE}
 ${KARPENTER_ROLE_ANNOTATION_KEY_VALUE}
@@ -443,6 +444,7 @@ ${NOTIFICATION_ENDPOINT}
 ${PF_PROVISIONING_ENABLED}
 ${RADIUS_PROXY_ENABLED}
 ${EXTERNAL_INGRESS_ENABLED}
+${HEALTHCHECKS_ENABLED}
 ${IMAGE_TAG_PREFIX}
 ${ARGOCD_BOOTSTRAP_ENABLED}
 ${ARGOCD_CDE_ROLE_SSM_TEMPLATE}
@@ -450,11 +452,12 @@ ${ARGOCD_CDE_URL_SSM_TEMPLATE}
 ${ARGOCD_ENVIRONMENTS}
 ${ARGOCD_SLACK_TOKEN_BASE64}
 ${SLACK_CHANNEL}
-${PROM_SLACK_CHANNEL}
+${OPSGENIE_API_KEY_BASE64}
 ${DASH_REPO_URL}
 ${DASH_REPO_BRANCH}
 ${APP_RESYNC_SECONDS}
-${IMAGE_LIST}'
+${IMAGE_LIST}
+${CERT_RENEW_BEFORE}'
 
 # Variables to replace within the generated cluster state code
 REPO_VARS="${REPO_VARS:-${DEFAULT_VARS}}"
@@ -561,43 +564,6 @@ get_is_ga_variable() {
     export IS_GA="${IS_GA}"
   else
     export IS_GA='false'
-  fi
-}
-
-########################################################################################################################
-# Export the IS_MY_PING environment variable for the provided customer. If it's already present as a boolean environment
-# variable, then export it as is. Otherwise, if the SSM path prefix for it is not 'unused', then try to retrieve it out
-# of SSM. On error, print a warning message, but default the value to false. On success, use the value from SSM.
-# Otherwise, default it to false.
-#
-# Arguments
-#   ${1} -> The value of the IS_MY_PING flag.
-########################################################################################################################
-get_is_myping_variable() {
-  if test "${IS_MY_PING}" = 'true' || test "${IS_MY_PING}" = 'false'; then
-    export IS_MY_PING="${IS_MY_PING}"
-    return
-  fi
-
-  local ssm_path_prefix="$1"
-
-  # Default false
-  IS_MY_PING='false'
-
-  if [ "${ssm_path_prefix}" != "unused" ]; then
-    # Getting value from ssm parameter store.
-    if ! ssm_value=$(get_ssm_value "${ssm_path_prefix}"); then
-      echo "Warn: ${ssm_value}"
-      echo "Defaulting IS_MY_PING=false."
-    else
-      IS_MY_PING="${ssm_value}"
-    fi
-  fi
-
-  if test "${IS_MY_PING}" = 'true' || test "${IS_MY_PING}" = 'false'; then
-    export IS_MY_PING="${IS_MY_PING}"
-  else
-    export IS_MY_PING='false'
   fi
 }
 
@@ -746,6 +712,8 @@ echo "Initial PGO_BACKUP_BUCKET_NAME: ${PGO_BACKUP_BUCKET_NAME}"
 echo "Initial RADIUS_PROXY_ENABLED: ${RADIUS_PROXY_ENABLED}"
 echo "Initial EXTERNAL_INGRESS_ENABLED: ${EXTERNAL_INGRESS_ENABLED}"
 
+echo "Initial HEALTHCHECKS_ENABLED: ${HEALTHCHECKS_ENABLED}"
+
 echo "Initial ARGOCD_BOOTSTRAP_ENABLED: ${ARGOCD_BOOTSTRAP_ENABLED}"
 echo "Initial ARGOCD_CDE_ROLE_SSM_TEMPLATE: ${ARGOCD_CDE_ROLE_SSM_TEMPLATE}"
 echo "Initial ARGOCD_CDE_URL_SSM_TEMPLATE: ${ARGOCD_CDE_URL_SSM_TEMPLATE}"
@@ -763,6 +731,8 @@ echo "Initial IRSA_PD_ANNOTATION_KEY_VALUE: ${IRSA_PD_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_PF_ANNOTATION_KEY_VALUE: ${IRSA_PF_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_ARGOCD_ANNOTATION_KEY_VALUE: ${IRSA_ARGOCD_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_CWAGENT_ANNOTATION_KEY_VALUE: ${IRSA_CWAGENT_ANNOTATION_KEY_VALUE}"
+echo "Initial IRSA_LOGSTASH_ANNOTATION_KEY_VALUE: ${IRSA_LOGSTASH_ANNOTATION_KEY_VALUE}"
+echo "Initial IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE: ${IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE: ${IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE: ${IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_INGRESS_ANNOTATION_KEY_VALUE: ${IRSA_INGRESS_ANNOTATION_KEY_VALUE}"
@@ -771,10 +741,11 @@ echo "Initial NLB_NGX_PUBLIC_ANNOTATION_KEY_VALUE: ${NLB_NGX_PUBLIC_ANNOTATION_K
 
 echo "Initial CLUSTER_ENDPOINT: ${CLUSTER_ENDPOINT}"
 echo "Initial KARPENTER_INSTANCE_PROFILE: ${KARPENTER_INSTANCE_PROFILE}"
+echo "Initial KARPENTER_CONTROLLER_IAM_ROLE: ${KARPENTER_CONTROLLER_IAM_ROLE}"
+echo "Initial DEFAULT_CLUSTER_UPTIME: ${DEFAULT_CLUSTER_UPTIME}"
 
 echo "Initial SLACK_CHANNEL: ${SLACK_CHANNEL}"
 echo "Initial NON_GA_SLACK_CHANNEL: ${NON_GA_SLACK_CHANNEL}"
-echo "Initial PROM_SLACK_CHANNEL: ${PROM_SLACK_CHANNEL}"
 
 echo "Initial IMAGE_LIST: ${IMAGE_LIST}"
 echo "Initial IMAGE_TAG_PREFIX: ${IMAGE_TAG_PREFIX}"
@@ -782,6 +753,8 @@ echo "Initial IMAGE_TAG_PREFIX: ${IMAGE_TAG_PREFIX}"
 echo "Initial APP_RESYNC_SECONDS: ${APP_RESYNC_SECONDS}"
 
 echo "Initial DASHBOARD_REPO_URL: ${DASHBOARD_REPO_URL}"
+
+echo "Initial CERT_RENEW_BEFORE: ${CERT_RENEW_BEFORE}"
 
 echo ---
 
@@ -876,12 +849,16 @@ export IRSA_PD_ANNOTATION_KEY_VALUE=${IRSA_PD_ANNOTATION_KEY_VALUE:-''}
 export IRSA_PF_ANNOTATION_KEY_VALUE=${IRSA_PF_ANNOTATION_KEY_VALUE:-''}
 export IRSA_ARGOCD_ANNOTATION_KEY_VALUE=${IRSA_ARGOCD_ANNOTATION_KEY_VALUE:-''}
 export IRSA_CWAGENT_ANNOTATION_KEY_VALUE=${IRSA_CWAGENT_ANNOTATION_KEY_VALUE:-''}
+export IRSA_LOGSTASH_ANNOTATION_KEY_VALUE=${IRSA_LOGSTASH_ANNOTATION_KEY_VALUE:-''}
+export IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE=${IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE:-''}
 export IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE=${IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE:-''}
 export IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE=${IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE:-''}
 export IRSA_INGRESS_ANNOTATION_KEY_VALUE=${IRSA_INGRESS_ANNOTATION_KEY_VALUE:-''}
 
 export CLUSTER_ENDPOINT=${CLUSTER_ENDPOINT:-''}
 export KARPENTER_INSTANCE_PROFILE=${KARPENTER_INSTANCE_PROFILE:-"KarpenterInstanceProfile"}
+export KARPENTER_CONTROLLER_IAM_ROLE=${KARPENTER_CONTROLLER_IAM_ROLE:-"KarpenterControllerRole"}
+export DEFAULT_CLUSTER_UPTIME=${DEFAULT_CLUSTER_UPTIME:-"Mon-Fri 09:00-18:00 UTC"}
 
 export KARPENTER_ROLE_ANNOTATION_KEY_VALUE=${KARPENTER_ROLE_ANNOTATION_KEY_VALUE:-''}
 
@@ -895,6 +872,7 @@ export PF_PROVISIONING_ENABLED="${PF_PROVISIONING_ENABLED:-false}"
 export RADIUS_PROXY_ENABLED="${RADIUS_PROXY_ENABLED:-false}"
 export ARGOCD_BOOTSTRAP_ENABLED="${ARGOCD_BOOTSTRAP_ENABLED:-true}"
 export EXTERNAL_INGRESS_ENABLED="${EXTERNAL_INGRESS_ENABLED:-""}"
+export HEALTHCHECKS_ENABLED="${HEALTHCHECKS_ENABLED:-false}"
 
 ### Default environment variables ###
 export ECR_REGISTRY_NAME='public.ecr.aws/r2h3l6e4'
@@ -931,10 +909,8 @@ export NON_GA_SLACK_CHANNEL="${NON_GA_SLACK_CHANNEL:-nowhere}"
 # If IS_GA=true, use default Slack channel; if IS_GA=false, use NON_GA_SLACK_CHANNEL value as Slack channel.
 if "${IS_GA}"; then
   export SLACK_CHANNEL="${SLACK_CHANNEL:-p1as-application-oncall}"
-  export PROM_SLACK_CHANNEL="${PROM_SLACK_CHANNEL:-p1as-application-oncall}"
 else
   export SLACK_CHANNEL="${SLACK_CHANNEL:-${NON_GA_SLACK_CHANNEL}}"
-  export PROM_SLACK_CHANNEL="${PROM_SLACK_CHANNEL:-${NON_GA_SLACK_CHANNEL}}"
 fi
 
 NEW_RELIC_LICENSE_KEY="${NEW_RELIC_LICENSE_KEY:-ssm://pcpt/sre/new-relic/java-agent-license-key}"
@@ -947,6 +923,9 @@ if [[ ${NEW_RELIC_LICENSE_KEY} == "ssm://"* ]]; then
     NEW_RELIC_LICENSE_KEY="${ssm_value}"
   fi
 fi
+
+OPSGENIE_API_KEY="${OPSGENIE_API_KEY:-PLACEHOLDER}"
+export OPSGENIE_API_KEY_BASE64=$(base64_no_newlines "${OPSGENIE_API_KEY}")
 
 export NEW_RELIC_LICENSE_KEY_BASE64=$(base64_no_newlines "${NEW_RELIC_LICENSE_KEY}")
 
@@ -981,8 +960,6 @@ if test ! "${KNOWN_HOSTS_CLUSTER_STATE_REPO}"; then
 fi
 export KNOWN_HOSTS_CLUSTER_STATE_REPO
 
-get_is_myping_variable "${CUSTOMER_SSO_SSM_PATH_PREFIX}/is-myping"
-
 # Set some product specific variables
 export USER_BASE_DN="${USER_BASE_DN:-dc=example,dc=com}"
 export USER_BASE_DN_2="${USER_BASE_DN_2}"
@@ -991,13 +968,15 @@ export USER_BASE_DN_4="${USER_BASE_DN_4}"
 export USER_BASE_DN_5="${USER_BASE_DN_5}"
 
 export PA_WAS_GCOPTION='-XX:+UseParallelGC'
-export PA_MIN_HEAP=1024m
-export PA_MAX_HEAP=1024m
-export PA_MIN_YGEN=512m
-export PA_MAX_YGEN=512m
+export PA_MIN_HEAP=${PA_MIN_HEAP:-"1024m"}
+export PA_MAX_HEAP=${PA_MAX_HEAP:-"1024m"}
+export PA_MIN_YGEN=${PA_MIN_YGEN:-"512m"}
+export PA_MAX_YGEN=${PA_MAX_YGEN:-"512m"}
 export PA_GCOPTION='-XX:+UseParallelGC'
 
 export APP_RESYNC_SECONDS="${APP_RESYNC_SECONDS:-60}"
+
+export CERT_RENEW_BEFORE="${CERT_RENEW_BEFORE:-720h0m0s}"
 
 ########################################################################################################################
 # Print out the final value being used for each variable.
@@ -1046,6 +1025,7 @@ echo "Using PF_PROVISIONING_ENABLED: ${PF_PROVISIONING_ENABLED}"
 echo "Using RADIUS_PROXY_ENABLED: ${RADIUS_PROXY_ENABLED}"
 echo "Using ARGOCD_BOOTSTRAP_ENABLED: ${ARGOCD_BOOTSTRAP_ENABLED}"
 echo "Using EXTERNAL_INGRESS_ENABLED: ${EXTERNAL_INGRESS_ENABLED}"
+echo "Using HEALTHCHECKS_ENABLED: ${HEALTHCHECKS_ENABLED}"
 echo "Using TARGET_DIR: ${TARGET_DIR}"
 echo "Using IS_BELUGA_ENV: ${IS_BELUGA_ENV}"
 
@@ -1061,19 +1041,22 @@ echo "Using IRSA_PD_ANNOTATION_KEY_VALUE: ${IRSA_PD_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_PF_ANNOTATION_KEY_VALUE: ${IRSA_PF_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_ARGOCD_ANNOTATION_KEY_VALUE: ${IRSA_ARGOCD_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_CWAGENT_ANNOTATION_KEY_VALUE: ${IRSA_CWAGENT_ANNOTATION_KEY_VALUE}"
+echo "Using IRSA_LOGSTASH_ANNOTATION_KEY_VALUE: ${IRSA_LOGSTASH_ANNOTATION_KEY_VALUE}"
+echo "Using IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE: ${IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE: ${IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE: ${IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_INGRESS_ANNOTATION_KEY_VALUE: ${IRSA_INGRESS_ANNOTATION_KEY_VALUE}"
 
 echo "Using CLUSTER_ENDPOINT: ${CLUSTER_ENDPOINT}"
 echo "Using KARPENTER_INSTANCE_PROFILE: ${KARPENTER_INSTANCE_PROFILE}"
+echo "Using KARPENTER_CONTROLLER_IAM_ROLE: ${KARPENTER_CONTROLLER_IAM_ROLE}"
+echo "Using DEFAULT_CLUSTER_UPTIME: ${DEFAULT_CLUSTER_UPTIME}"
 
 echo "Using KARPENTER_ROLE_ANNOTATION_KEY_VALUE: ${KARPENTER_ROLE_ANNOTATION_KEY_VALUE}"
 
 echo "Using NLB_NGX_PUBLIC_ANNOTATION_KEY_VALUE: ${NLB_NGX_PUBLIC_ANNOTATION_KEY_VALUE}"
 
 echo "Using SLACK_CHANNEL: ${SLACK_CHANNEL}"
-echo "Using PROM_SLACK_CHANNEL: ${PROM_SLACK_CHANNEL}"
 
 echo "Using APP_RESYNC_SECONDS: ${APP_RESYNC_SECONDS}"
 
@@ -1083,6 +1066,8 @@ echo "Using IMAGE_LIST: ${IMAGE_LIST}"
 echo "Using IMAGE_TAG_PREFIX: ${IMAGE_TAG_PREFIX}"
 
 echo "Using DASHBOARD_REPO_URL: ${DASHBOARD_REPO_URL}"
+
+echo "Using CERT_RENEW_BEFORE: ${CERT_RENEW_BEFORE}"
 
 echo ---
 
@@ -1174,7 +1159,7 @@ for ENV_OR_BRANCH in ${SUPPORTED_ENVIRONMENT_TYPES}; do
       ;;
   esac
 
-  # Update the Let's encrypt server to use staging/production based on GA/MyPing customers or the environment type.
+  # Update the Let's encrypt server to use staging/production based on GA customers or the environment type.
   PROD_LETS_ENCRYPT_SERVER='https://acme-v02.api.letsencrypt.org/directory'
   STAGE_LETS_ENCRYPT_SERVER='https://acme-staging-v02.api.letsencrypt.org/directory'
 
@@ -1209,29 +1194,29 @@ for ENV_OR_BRANCH in ${SUPPORTED_ENVIRONMENT_TYPES}; do
   case "${ENV}" in
     dev | test)
       # Set PF variables
-      export PF_MIN_HEAP=1536m
-      export PF_MAX_HEAP=1536m
-      export PF_MIN_YGEN=768m
-      export PF_MAX_YGEN=768m
+      export PF_MIN_HEAP=${PF_MIN_HEAP:-"1536m"}
+      export PF_MAX_HEAP=${PF_MAX_HEAP:-"1536m"}
+      export PF_MIN_YGEN=${PF_MIN_YGEN:-"768m"}
+      export PF_MAX_YGEN=${PF_MAX_YGEN:-"768m"}
 
       # Set PA variables
-      export PA_WAS_MIN_HEAP=1024m
-      export PA_WAS_MAX_HEAP=1024m
-      export PA_WAS_MIN_YGEN=512m
-      export PA_WAS_MAX_YGEN=512m
+      export PA_WAS_MIN_HEAP=${PA_WAS_MIN_HEAP:-"1024m"}
+      export PA_WAS_MAX_HEAP=${PA_WAS_MAX_HEAP:-"1024m"}
+      export PA_WAS_MIN_YGEN=${PA_WAS_MIN_YGEN:-"512m"}
+      export PA_WAS_MAX_YGEN=${PA_WAS_MAX_YGEN:-"512m"}
       ;;
     stage | prod | customer-hub)
       # Set PF variables
-      export PF_MIN_HEAP=3072m
-      export PF_MAX_HEAP=3072m
-      export PF_MIN_YGEN=1536m
-      export PF_MAX_YGEN=1536m
+      export PF_MIN_HEAP=${PF_MIN_HEAP:-"3072m"}
+      export PF_MAX_HEAP=${PF_MAX_HEAP:-"3072m"}
+      export PF_MIN_YGEN=${PF_MIN_YGEN:-"1536m"}
+      export PF_MAX_YGEN=${PF_MAX_YGEN:-"1536m"}
 
       # Set PA variables
-      export PA_WAS_MIN_HEAP=2048m
-      export PA_WAS_MAX_HEAP=2048m
-      export PA_WAS_MIN_YGEN=1024m
-      export PA_WAS_MAX_YGEN=1024m
+      export PA_WAS_MIN_HEAP=${PA_WAS_MIN_HEAP:-"2048m"}
+      export PA_WAS_MAX_HEAP=${PA_WAS_MAX_HEAP:-"2048m"}
+      export PA_WAS_MIN_YGEN=${PA_WAS_MIN_YGEN:-"1024m"}
+      export PA_WAS_MAX_YGEN=${PA_WAS_MAX_YGEN:-"1024m"}
       ;;
   esac
 
@@ -1244,24 +1229,27 @@ for ENV_OR_BRANCH in ${SUPPORTED_ENVIRONMENT_TYPES}; do
 
   add_derived_variables
 
-  # TODO: With https://pingidentity.atlassian.net/browse/PP-5719 we should see all of the IRSA roles represented like
+  # TODO: With https://pingidentity.atlassian.net/browse/PP-6073 we should see all of the IRSA roles represented like
   # ArgoCD, then we can change this IRSA SSM fetch code to be consistent
   # shellcheck disable=SC2016
   IRSA_TEMPLATE='eks.amazonaws.com/role-arn: ${ssm_value}'
   set_var "IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/cert-manager/arn" "${IRSA_TEMPLATE}"
   set_var "IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/external-dns/arn" "${IRSA_TEMPLATE}"
-  set_var "IRSA_PING_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}" "${IRSA_TEMPLATE}/irsa-ping"
-  set_var "IRSA_PA_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}" "${IRSA_TEMPLATE}/irsa-pingaccess"
-  set_var "IRSA_PD_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}" "${IRSA_TEMPLATE}/irsa-pingdirectory"
-  set_var "IRSA_PF_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}" "${IRSA_TEMPLATE}/irsa-pingfederate"
-  set_var "IRSA_CWAGENT_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}" "${IRSA_TEMPLATE}/irsa-cloudwatch-agent"
+  set_var "IRSA_PING_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/irsa-ping/arn" "${IRSA_TEMPLATE}"
+  set_var "IRSA_PA_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/pingaccess/arn" "${IRSA_TEMPLATE}"
+  set_var "IRSA_PD_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/pingdirectory/arn" "${IRSA_TEMPLATE}"
+  set_var "IRSA_PF_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/pingfederate/arn" "${IRSA_TEMPLATE}"
+  set_var "IRSA_CWAGENT_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/cloudwatch-agent/arn" "${IRSA_TEMPLATE}"
+  set_var "IRSA_LOGSTASH_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/logstash/arn" "${IRSA_TEMPLATE}"
+  set_var "IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/opensearch/arn" "${IRSA_TEMPLATE}"
+  # ArgoCD only for customer-hub
   set_var "IRSA_ARGOCD_ANNOTATION_KEY_VALUE" "" "${IRSA_BASE_PATH}" "irsa-argocd/arn" "${IRSA_TEMPLATE}"
   set_var "IRSA_INGRESS_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/ingress-controller/arn" "${IRSA_TEMPLATE}"
 
   # shellcheck disable=SC2016
   KARPENTER_ROLE_TEMPLATE='eks.amazonaws.com/role-arn: arn:aws:iam::${ssm_value}:role'
   set_var "KARPENTER_ROLE_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}" \
-          "${KARPENTER_ROLE_TEMPLATE}/KarpenterControllerRole"
+          "${KARPENTER_ROLE_TEMPLATE}/${KARPENTER_CONTROLLER_IAM_ROLE}"
 
   set_var "CLUSTER_ENDPOINT" "" "${ACCOUNT_BASE_PATH}${ENV}" "/cluster_endpoint"
 
@@ -1351,7 +1339,7 @@ for ENV_OR_BRANCH in ${SUPPORTED_ENVIRONMENT_TYPES}; do
   organize_code_for_csr
 
   PRIMARY_PING_KUST_FILE="${K8S_CONFIGS_DIR}/${REGION_NICK_NAME}/kustomization.yaml"
-
+  
   # Copy around files for Developer CDE before substituting vars
   if "${IS_BELUGA_ENV}"; then
     echo "IS_BELUGA_ENV detected, making developer changes to deployment"
@@ -1362,6 +1350,19 @@ for ENV_OR_BRANCH in ${SUPPORTED_ENVIRONMENT_TYPES}; do
 
     # Add IS_BELUGA_ENV to the base values.yaml
     substitute_vars "${ENV_DIR}/values-files" '${IS_BELUGA_ENV}'
+
+    # Resetting to empty string , once versent is done https://pingidentity.atlassian.net/browse/PP-5719 and will remove this code as per PDO-5136
+    export IRSA_PING_ANNOTATION_KEY_VALUE=""
+    export IRSA_PA_ANNOTATION_KEY_VALUE=""
+    export IRSA_PD_ANNOTATION_KEY_VALUE=""
+    export IRSA_PF_ANNOTATION_KEY_VALUE=""
+    export IRSA_CWAGENT_ANNOTATION_KEY_VALUE=""
+
+    sed -i.bak -e "/disable-karpenter/ s|^#*|#|g" "${K8S_CONFIGS_DIR}/base/cluster-tools/karpenter/kustomization.yaml"
+    sed -i.bak -e "/disable-kubedownscaler/ s|^#*|#|g" "${K8S_CONFIGS_DIR}/base/cluster-tools/kube-downscaler/kustomization.yaml"
+
+    rm -f "${K8S_CONFIGS_DIR}/base/cluster-tools/karpenter/kustomization.yaml.bak"
+    rm -f "${K8S_CONFIGS_DIR}/base/cluster-tools/kube-downscaler/kustomization.yaml.bak"
 
     # Update patches related to Beluga developer CDEs
 
@@ -1376,21 +1377,26 @@ for ENV_OR_BRANCH in ${SUPPORTED_ENVIRONMENT_TYPES}; do
     cp -R "${CHUB_TEMPLATES_DIR}/base/cluster-tools/git-ops" "${K8S_CONFIGS_DIR}/base/cluster-tools/"
     cp -R "${CHUB_TEMPLATES_DIR}/region/git-ops" "${K8S_CONFIGS_DIR}/${REGION_NICK_NAME}/"
 
-    # Append patch to merge base and region env vars for ArgoCD in region customization.yaml
+    # Append patch to merge base and region env vars for ArgoCD in region kustomization.yaml
     export CHUB_REGION_KUST_FILE="${CHUB_TEMPLATES_DIR}/region/kustomization.yaml"
     yq eval -i '.configMapGenerator += (load(strenv(CHUB_REGION_KUST_FILE)).configMapGenerator[] | select(.name == "argocd-bootstrap"))' "${PRIMARY_PING_KUST_FILE}"
 
     # Keep ArgoCD in pingaccess-was-ingress by replacing the delete patches
     # shellcheck disable=SC2016
-    export argocd_ingress_patch='
+    if test "${ENV}" = "${CUSTOMER_HUB}"; then
+      argo_host_index=5
+    else
+      argo_host_index=6
+    fi
+    export argocd_ingress_patch="
 # Argo CD pingaccess was runtime
 - op: replace
-  path: /spec/tls/0/hosts/6
+  path: /spec/tls/0/hosts/${argo_host_index}
   value: argocd.${DNS_ZONE}
 - op: replace
-  path: /spec/rules/6/host
+  path: /spec/rules/${argo_host_index}/host
   value: argocd.${DNS_ZONE}
-'
+"
     K8S_CONFIGS_PA_WAS_ENGINE_KUSTOMIZE_FILE="${K8S_CONFIGS_DIR}/base/ping-cloud/pingaccess-was/engine/kustomization.yaml"
     yq eval -i '.patchesJson6902[1].patch |= (from_yaml | .[:-2] | to_yaml)' "${K8S_CONFIGS_PA_WAS_ENGINE_KUSTOMIZE_FILE}"
     yq eval -i '.patchesJson6902[1].patch += strenv(argocd_ingress_patch)' "${K8S_CONFIGS_PA_WAS_ENGINE_KUSTOMIZE_FILE}"
@@ -1408,6 +1414,13 @@ for ENV_OR_BRANCH in ${SUPPORTED_ENVIRONMENT_TYPES}; do
   if test "${TENANT_DOMAIN}" = "${PRIMARY_TENANT_DOMAIN}"; then
     sed -i.bak 's/^\(.*remove-from-secondary-patch.yaml\)$/# \1/g' "${PRIMARY_PING_KUST_FILE}"
     rm -f "${PRIMARY_PING_KUST_FILE}.bak"
+  else
+    # Child regions
+    if test "${HEALTHCHECKS_ENABLED}" != "true"; then
+      # When healthchecks are disabled, comment out duplicated delete patches for deployments in child regions
+      sed -i.bak 's/^\(.*health\/remove-from-secondary-patch.yaml\)$/# \1/g' "${PRIMARY_PING_KUST_FILE}"
+      rm -f "${PRIMARY_PING_KUST_FILE}.bak"
+    fi
   fi
 
   echo "Copying server profiles for environment ${ENV}"
