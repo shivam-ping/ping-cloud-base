@@ -16,7 +16,6 @@ import warnings
 import k8s_utils
 from pingone import common as p1_utils
 
-USER = os.getenv("USER")
 K8S = k8s_utils.K8sUtils()
 ENV_METADATA_CM = K8S.get_configmap_values(namespace="ping-cloud", configmap_name="p14c-environment-metadata")
 ENV_METADATA = json.loads(ENV_METADATA_CM.get("information.json"))
