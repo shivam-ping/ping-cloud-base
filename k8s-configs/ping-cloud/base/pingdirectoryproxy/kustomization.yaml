@@ -8,3 +8,4 @@ resources:
   - statefulset.yaml
   - pingdirectoryproxy-passwords.yaml
   - rbac.yaml
+  - serviceAccount.yaml
