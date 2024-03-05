@@ -72,6 +72,9 @@ resources:
 # Ping Data Sync resources
 - ../pingdatasync/server
 
+# PingDirectoryProxy resources
+- ../pingdirectoryproxy
+
 # WARNING!!!
 #
 # Exposing the pingdataconsole in production is not recommended. The console resources only exist for debugging

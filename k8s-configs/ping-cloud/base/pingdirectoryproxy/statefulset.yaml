@@ -1,0 +1,180 @@
+# This defines the deployment (as a stateful set) of the pingdirectoryproxy servers
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pingdirectoryproxy
+  labels:
+    class: pingdirectoryproxy
+spec:
+  serviceName: pingdirectoryproxy
+  replicas: 1
+  selector:
+    matchLabels:
+      class: pingdirectoryproxy
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
+  template:
+    metadata:
+      annotations:
+        lastUpdateReason: "NA"
+      labels:
+        class: pingdirectoryproxy
+    spec:
+      serviceAccount: pingdirectoryproxy-serviceaccount
+      terminationGracePeriodSeconds: 300
+      initContainers:
+        - name: pingdirectoryproxy-init
+          securityContext:
+            runAsGroup: 9999
+            runAsNonRoot: true
+            runAsUser: 9031
+            allowPrivilegeEscalation: false
+          image: public.ecr.aws/r2h3l6e4/pingcloud-services/toolkit:v1.12.1
+          imagePullPolicy: IfNotPresent
+          command:
+            - /copy-dependencies.sh
+          envFrom:
+            - configMapRef:
+                name: pingdirectoryproxy-environment-variables
+          volumeMounts:
+            - name: ssh-dir
+              mountPath: /.ssh
+            - name: data-dir
+              mountPath: /data
+            - name: pingcommon-init
+              mountPath: /copy-dependencies.sh
+              subPath: copy-dependencies.sh
+            - name: pingcommon-init
+              mountPath: /utils.lib.sh
+              subPath: utils.lib.sh
+            - name: pingcommon-init
+              mountPath: /logger.lib.sh
+              subPath: logger.lib.sh
+        - name: pingdirectoryproxy-discovery-service
+          image: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/amazon/aws-cli:2.0.17
+          imagePullPolicy: IfNotPresent
+          command:
+            - /get_ssm_env_vars.sh
+          envFrom:
+            - configMapRef:
+                name: pingdirectoryproxy-environment-variables
+          volumeMounts:
+            - name: data-dir
+              mountPath: /config
+            - name: pingcommon-init
+              mountPath: /get_ssm_env_vars.sh
+              subPath: get_ssm_env_vars.sh
+      containers:
+        - name: pingdirectoryproxy
+          securityContext:
+            runAsGroup: 9999
+            runAsNonRoot: true
+            runAsUser: 9031
+            allowPrivilegeEscalation: false
+          image: public.ecr.aws/r2h3l6e4/pingidentity/pingdirectoryproxy:2310-9.3.0.2
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 1389
+              name: ldap
+            - containerPort: 1636
+              name: ldaps
+            - containerPort: 1443
+              name: https
+          resources:
+            limits:
+              memory: "4Gi"
+              cpu: 2
+            requests:
+              memory: "4Gi"
+              cpu: 2
+          env:
+            - name: ROOT_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pingdirectoryproxy-passwords
+                  key: root-user-password
+            - name: DMANAGER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pingdirectoryproxy-passwords
+                  key: DMANAGER_PASSWORD
+            - name: ACME_CERT_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pingdirectoryproxy-passwords
+                  key: ACME_CERT_KEYSTORE_PASSWORD
+          envFrom:
+            - configMapRef:
+                name: pingdirectoryproxy-environment-variables
+          volumeMounts:
+            - name: ssh-dir
+              mountPath: /home/ping/.ssh
+            - name: shared-dir
+              mountPath: /opt/shared-dir
+            - name: data-dir
+              mountPath: /usr/local/bin/kubectl
+              subPath: kubectl
+            - name: data-dir
+              mountPath: /opt/staging/hooks/logger.lib.sh
+              subPath: logger.lib.sh
+            - name: out-dir
+              mountPath: /opt/out
+            - name: pingdirectoryproxy-passwords
+              mountPath: /usr/local/secrets
+              readOnly: true
+            - name: acme-tls-cert
+              mountPath: /usr/local/secrets/certs
+              readOnly: true
+            - name: pingdirectory-license
+              mountPath: /opt/in/instance/PingDirectory.lic
+              subPath: PingDirectory.lic
+            - name: data-dir
+              mountPath: /opt/staging/ds_env_vars
+              subPath: ds_env_vars
+      securityContext:
+        fsGroup: 9999
+      volumes:
+        - name: ssh-dir
+          emptyDir: {}
+        - name: shared-dir
+          emptyDir: {}
+        - name: data-dir
+          emptyDir: {}
+        - name: out-dir
+          emptyDir: {}
+        - name: pingcommon-init
+          configMap:
+            name: pingcommon-init
+            defaultMode: 0555
+        - name: ssh-id-key-secret
+          secret:
+            secretName: ssh-id-key-secret
+            optional: true
+            defaultMode: 0400
+        - name: known-hosts-config
+          configMap:
+            name: known-hosts-config
+            optional: true
+            defaultMode: 0644
+        - name: pingdirectory-license
+          secret:
+            secretName: pingdirectory-license
+            optional: true
+            defaultMode: 0400
+        - name: pingdirectoryproxy-passwords
+          secret:
+            secretName: pingdirectoryproxy-passwords
+            optional: true
+            defaultMode: 0400
+        - name: acme-tls-cert
+          secret:
+            secretName: acme-tls-cert
+            optional: true
+            defaultMode: 0400
+        - name: pingdirectory-truststore-certs
+          secret:
+            secretName: pingdirectory-truststore-certs
+            optional: true
+            defaultMode: 0400
