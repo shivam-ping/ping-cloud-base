@@ -143,6 +143,7 @@
 - Update pod memory limits for PingDirectory
 - Update pod cpu limits for PingDirectory
 - Upgrade ArgoCD to v2.10.0
+- ArgoCD Partner and PS Access via config-team
 
 _Changes:_
 
@@ -339,6 +340,7 @@ _Changes:_
 - [X] PDO-6674 Logstash: Parsing issue with pd-errors logs
 - [X] PDO-6694 Update pod memory limits for PingDirectory
 - [X] PDO-6695 Update pod cpu limits for PingDirectory
+- [X] PDO-6773 ArgoCD Partner and PS Access via config-team
 
 ### 1.18.0.0
 
