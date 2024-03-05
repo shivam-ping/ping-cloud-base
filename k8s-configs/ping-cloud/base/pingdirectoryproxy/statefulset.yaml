@@ -25,31 +25,39 @@ spec:
       serviceAccount: pingdirectoryproxy-serviceaccount
       terminationGracePeriodSeconds: 300
       initContainers:
-        - name: pingdirectoryproxy-init
+        - name: pingdirectory-init
           securityContext:
             runAsGroup: 9999
             runAsNonRoot: true
             runAsUser: 9031
             allowPrivilegeEscalation: false
-          image: public.ecr.aws/r2h3l6e4/pingcloud-services/toolkit:v1.19.0
-          imagePullPolicy: IfNotPresent
+          image: public.ecr.aws/r2h3l6e4/pingcloud-services/toolkit:v1.15.0
+          imagePullPolicy: Always
           command:
             - /copy-dependencies.sh
           envFrom:
             - configMapRef:
-                name: pingdirectoryproxy-environment-variables
+                name: pingdirectory-environment-variables
+            - configMapRef:
+                name: pingcommon-environment-variables
           volumeMounts:
             - name: ssh-dir
               mountPath: /.ssh
             - name: data-dir
               mountPath: /data
-            - name: pingcommon-init
+            - name: ssh-id-key-secret
+              mountPath: /id_rsa
+              subPath: id_rsa
+            - name: known-hosts-config
+              mountPath: /known_hosts
+              subPath: known_hosts
+            - name: pingdirectory-init
               mountPath: /copy-dependencies.sh
               subPath: copy-dependencies.sh
-            - name: pingcommon-init
+            - name: pingdirectory-init
               mountPath: /utils.lib.sh
               subPath: utils.lib.sh
-            - name: pingcommon-init
+            - name: pingdirectory-init
               mountPath: /logger.lib.sh
               subPath: logger.lib.sh
         - name: pingdirectoryproxy-discovery-service
