@@ -10,3 +10,4 @@ resources:
 - pingdelegator
 - pingcentral
 - pingdatasync
+- pingdirectoryproxy
