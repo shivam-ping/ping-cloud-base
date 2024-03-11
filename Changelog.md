@@ -143,6 +143,7 @@
 - No data on Karpenter Grafana dashboards
 - Update pod memory limits for PingDirectory
 - Update pod cpu limits for PingDirectory
+- [DEV CDE ONLY] Remove IRSA role setting to empty string
 - Upgrade ArgoCD to v2.10.0
 - Remove argocd-events, Prometheus alerts, rules, alertmanager
 
@@ -295,6 +296,7 @@ _Changes:_
 - [X] PDO-6375 Increase PA log ingestion into ELK
 - [X] PDO-6377 Increase PF log ingestion into ELK
 - [X] PDO-6378 Increase PD log ingestion into ELK
+- [X] PDO-6384 [DEV CDE ONLY] Remove IRSA role setting to empty string
 - [X] PDO-6411 Increase OpenSearch warm replicas to 3 to make it HA
 - [X] PDO-6420 Update tag-release.sh to replace the helm chart versions in PCB
 - [X] PDO-6429 Create password for pf.cluster.auth.pwd property within run.properties for PingFederate
