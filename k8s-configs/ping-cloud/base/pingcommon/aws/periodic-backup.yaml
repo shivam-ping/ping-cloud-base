@@ -22,7 +22,7 @@ data:
     SCRIPT="${HOOKS_DIR}"/90-upload-backup-s3.sh
     LOG_FILE=/tmp/upload.log
 
-    echo "Uploading pingaccess backup data on server ${SERVER}"
+    echo "Uploading ${K8S_STATEFUL_SET_NAME} backup data on server ${SERVER}"
     /tmp/kubectl exec "${SERVER}" -c "${K8S_STATEFUL_SET_NAME}" -- sh -c \
             "test -x ${SCRIPT} && \
             ${SCRIPT}"> "${LOG_FILE}"
