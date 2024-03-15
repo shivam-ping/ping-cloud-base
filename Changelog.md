@@ -146,6 +146,9 @@
 - [DEV CDE ONLY] Remove IRSA role setting to empty string
 - Upgrade ArgoCD to v2.10.0
 - Remove argocd-events, Prometheus alerts, rules, alertmanager
+- Remove kube-rbac-proxy logs
+- Remove ArgoCD Image Updater
+- Removing duplicate configMaps for backups for PF/PA/PA-WAS, removing product name from  K8S_STATEFUL_SET_NAME var
 
 _Changes:_
 
@@ -277,6 +280,7 @@ _Changes:_
 - [X] PDO-6188 Update alert rules for PGO
 - [X] PDO-6189 Fluentbit: Performance degradation under high load
 - [X] PDO-6190 Logstash: Readiness probe fails under high load
+- [X] PDO-6203 Create standard and reusable configmap for backups in all ping products
 - [X] PDO-6224 Remove Grafana ping-app patches from remove-from-secondary-patch.yaml 
 - [X] PDO-6241 Remove Grafana from ping-cloud-base image tag list
 - [X] PDO-6242 Configure newrelic-prometheus-agent to collect FluentBit and Logstash metrics
@@ -345,6 +349,9 @@ _Changes:_
 - [X] PDO-6674 Logstash: Parsing issue with pd-errors logs
 - [X] PDO-6694 Update pod memory limits for PingDirectory
 - [X] PDO-6695 Update pod cpu limits for PingDirectory
+- [X] PDO-6810 Remove argocd-image-updater k8s resources from ping-cloud-base
+- [X] PDO-6873 Remove kube-rbac-proxy logs
+- [X] PDO-7079 Ingress configuration update as per the Performance team's recommendations
 
 ### 1.18.0.0
 
