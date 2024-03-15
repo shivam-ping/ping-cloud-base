@@ -11,21 +11,21 @@ patchesJson6902:
 # Adjust the volume size for instances that will be provisioned by Karpenter.
 patches:
   - target:
-      kind: AWSNodeTemplate
+      kind: EC2NodeClass
       name: default
     patch: |-
       - op: replace
         path: /spec/blockDeviceMappings/0/ebs/volumeSize
         value: '120Gi'
   - target:
-      kind: AWSNodeTemplate
+      kind: EC2NodeClass
       name: pd-only
     patch: |-
       - op: replace
         path: /spec/blockDeviceMappings/0/ebs/volumeSize
         value: '120Gi'
   - target:
-      kind: AWSNodeTemplate
+      kind: EC2NodeClass
       name: pgo-only
     patch: |-
       - op: replace
@@ -34,8 +34,8 @@ patches:
 
 patchesStrategicMerge:
 - |-
-  apiVersion: karpenter.sh/v1alpha5
-  kind: Provisioner
+  apiVersion: karpenter.sh/v1beta1
+  kind: NodePool
   metadata:
     name: default
   spec:
@@ -49,10 +49,13 @@ patchesStrategicMerge:
       - key: "karpenter.sh/capacity-type"
         operator: In
         values: ["on-demand"]
+      - key: kubernetes.io/os
+        operator: In
+        values: ["linux"]
 
 - |-
-  apiVersion: karpenter.sh/v1alpha5
-  kind: Provisioner
+  apiVersion: karpenter.sh/v1beta1
+  kind: NodePool
   metadata:
     name: pd-only
   spec:
@@ -68,12 +71,11 @@ patchesStrategicMerge:
         values: ["on-demand"]
       - key: kubernetes.io/os
         operator: In
-        values:
-        - linux
+        values: ["linux"]
 
 - |-
-  apiVersion: karpenter.sh/v1alpha5
-  kind: Provisioner
+  apiVersion: karpenter.sh/v1beta1
+  kind: NodePool
   metadata:
     name: pgo-only
   spec:
@@ -89,5 +91,4 @@ patchesStrategicMerge:
         values: ["on-demand"]
       - key: kubernetes.io/os
         operator: In
-        values:
-          - linux
+        values: ["linux"]

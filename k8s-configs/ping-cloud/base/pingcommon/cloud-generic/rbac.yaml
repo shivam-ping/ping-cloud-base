@@ -51,16 +51,27 @@ rules:
     - get
     - list
     - watch
+    - patch
   - apiGroups:
     - ""
     resources:
     - "pods"
     - "pods/log"
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
     - "secrets"
     verbs:
     - get
     - list
     - watch
+    - create
+    - update
+    - patch
   - apiGroups:
     - ""
     resources:
@@ -92,6 +103,12 @@ rules:
     verbs:
     - list
     - watch
+    - get
+  - apiGroups:
+    - ""
+    resources:
+    - endpoints
+    verbs:
     - get
 
 ---
@@ -135,6 +152,7 @@ rules:
     - delete
     - get
     - create
+    - patch
   - apiGroups:
     - ""
     - "apps"
@@ -159,7 +177,6 @@ rules:
       - list
       - watch
       - get
-
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1

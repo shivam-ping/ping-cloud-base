@@ -11,6 +11,7 @@ metadata:
   name: argo-git-deploy
   annotations:
     sealedsecrets.bitnami.com/managed: "true"
+    argocd.argoproj.io/sync-options: Prune=false
     managed-by: argocd.argoproj.io
 type: Opaque
 ---
@@ -20,3 +21,18 @@ kind: ConfigMap
 metadata:
   name: argocd-bootstrap
   namespace: argocd
+---
+# Add the plugin configuration file in the sidecar
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: git-ops-command-plugin-cm
+data:
+  plugin.yaml: |
+    apiVersion: argoproj.io/v1alpha1
+    kind: ConfigManagementPlugin
+    metadata:
+      name: git-ops-command
+    spec:
+      generate:
+        command: [ "git-ops-command.sh" ]

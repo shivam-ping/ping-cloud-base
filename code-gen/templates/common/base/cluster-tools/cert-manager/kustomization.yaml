@@ -41,6 +41,41 @@ patchesStrategicMerge:
         passwordSecretRef:
           name: pingcommon-passwords
           key: ACME_CERT_KEYSTORE_PASSWORD
+    # added to enable the auto-renewal functionality from cert-manager
+    renewBefore: ${CERT_RENEW_BEFORE}
+    
+- |-
+  # Add IRSA role annotation to cert-manager service account
+  apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: cert-manager
+    namespace: cert-manager
+    annotations:
+      purpose: service-account-for-cert-manager
+      ${IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE}
+
+- |-
+  # Add IRSA role annotation to cert-manager-cainjector service account
+  apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: cert-manager-cainjector
+    namespace: cert-manager
+    annotations:
+      purpose: service-account-for-cert-manager-cainjector
+      ${IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE}
+
+- |-
+  # Add IRSA role annotation to cert-manager-webhook service account
+  apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: cert-manager-webhook
+    namespace: cert-manager
+    annotations:
+      purpose: service-account-for-cert-manager-webhook
+      ${IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE}
 
 patchesJson6902:
 

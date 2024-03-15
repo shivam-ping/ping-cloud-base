@@ -28,7 +28,7 @@ spec:
     spec:
       serviceAccountName: ping-serviceaccount
       initContainers:
-      - name: pingaccess-was-p14c-init
+      - name: pingaccess-was-p1as-sso
         securityContext:
           runAsGroup: 9999
           runAsNonRoot: true
@@ -36,22 +36,20 @@ spec:
           allowPrivilegeEscalation: false
         image: public.ecr.aws/r2h3l6e4/pingcloud-services/p14c-integration/dev:v1.19-release-branch-latest
         imagePullPolicy: Always
-        env:
-        - name: NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        command: [ 'python3', '-u', '/app/pingaccess_was_p1_init.py' ]
-        volumeMounts:
-        - name: data-dir
-          mountPath: /opt/staging
+        envFrom:
+        - configMapRef:
+            name: pingaccess-was-admin-environment-variables
+        command:
+          - /bin/sh
+          - -c
+          - python3 -u /app/oauth_client_services_controller.py --app pingaccess-was
       - name: pingaccess-was-init
         securityContext:
           runAsGroup: 9999
           runAsNonRoot: true
           runAsUser: 9031
           allowPrivilegeEscalation: false
-        image: public.ecr.aws/r2h3l6e4/pingcloud-services/toolkit:v1.15.0
+        image: public.ecr.aws/r2h3l6e4/pingcloud-services/toolkit:v1.19.0
         imagePullPolicy: IfNotPresent
         command:
         - /copy-dependencies.sh
@@ -88,7 +86,7 @@ spec:
           runAsNonRoot: true
           runAsUser: 9031
           allowPrivilegeEscalation: false
-        image: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/busybox:1.32
+        image: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/busybox:1.36
         imagePullPolicy: IfNotPresent
         command:
         - /wait-for-services.sh
@@ -149,6 +147,13 @@ spec:
           runAsNonRoot: true
           runAsUser: 9031
           allowPrivilegeEscalation: false
+        resources:
+          requests:
+            memory: "6Gi"
+            cpu: 2
+          limits:
+            memory: "6Gi"
+            cpu: 2       
         volumeMounts:
         - name: ssh-dir
           mountPath: /home/ping/.ssh
@@ -287,21 +292,6 @@ spec:
             secretKeyRef:
               name: pingaccess-was-passwords
               key: PA_ADMIN_USER_PASSWORD
-        - name: P14C_ISSUER
-          valueFrom:
-            secretKeyRef:
-              name: pingaccess-was-passwords
-              key: P14C_ISSUER
-        - name: P14C_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              name: pingaccess-was-passwords
-              key: P14C_CLIENT_ID
-        - name: P14C_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: pingaccess-was-passwords
-              key: P14C_CLIENT_SECRET
         - name: NEW_RELIC_CONFIG_FILE
           value: "/opt/shared-dir/newrelic.yml"
         - name: LOG4J_FORMAT_MSG_NO_LOOKUPS
@@ -311,6 +301,9 @@ spec:
             name: pingaccess-was-admin-environment-variables
         - secretRef:
             name: newrelic-license-key
+            optional: false
+        - secretRef:
+            name: pingaccess-was-admin-p14c
             optional: false
       securityContext:
         fsGroup: 9999
@@ -358,6 +351,8 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: out-dir
+      annotations:
+        volume.autoscaler.kubernetes.io/ignore: "true"
     spec:
       accessModes:
       - ReadWriteOnce

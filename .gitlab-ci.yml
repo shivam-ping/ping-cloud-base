@@ -11,14 +11,17 @@ stages:
 - compile
 - find-cluster
 - deploy
+- pre-check-test
 - pa-was-test
 - integration-test
 - chaos
 - cleanup
+- security # move this to the end and we'll use the "needs" keyword to allow it to run earlier and out of order
 
 ## Global environment variables ##
 variables:
   DELETE_ENV_AFTER_PIPELINE: 'true'
+  CLUSTER_POSTFIXES: '_9 _10 _11'
   K8S_DEPLOY_TOOLS: docker.corp.pingidentity.com:5000/platform-pipeline/k8s-deploy-tools:v1.19-release-branch
   SHARED_CI_SCRIPTS_DIR: "/ci-scripts"
   BRANCH_SKIP_TESTS: >
@@ -26,6 +29,7 @@ variables:
     pingdelegator/01-admin-user-login.sh
     pingdirectory/03-backup-restore.sh
     pingdirectory/08-test-http-connection-handler.sh
+    monitoring/03-nri-kubernetes.sh
 
 ## Compile stage ##
 compile:
@@ -33,8 +37,62 @@ compile:
  tags:
    - default-gitlab-runner-ping-cloud
  image: ${K8S_DEPLOY_TOOLS}
+ variables:
+   YAML_OUT_DIR: $CI_PROJECT_DIR/out
+ before_script:
+   - mkdir -p $YAML_OUT_DIR
  script:
    - ${SHARED_CI_SCRIPTS_DIR}/k8s/compile/compile.sh
+ artifacts:
+   paths:
+     - out/
+   expire_in: 1 day
+
+## start security stage ##
+copy-images:
+  stage: security
+  image: ${K8S_DEPLOY_TOOLS}
+  needs:
+    - compile
+  dependencies:
+    - compile
+  variables:
+    BELUGA_VERSION: $CI_COMMIT_REF_NAME
+    ARTIFACTORY_URL: "docker.corp.pingidentity.com:5900"
+    ARTIFACTORY_PATH: "beluga-xray"
+    UBER_YAML: $CI_PROJECT_DIR/out/_builds_ping-cloud-private-tenant_ping-cloud-base.yaml
+  allow_failure: true
+  before_script:
+    - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | HOME=/tmp docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+  script:
+    - ${SHARED_CI_SCRIPTS_DIR}/k8s/security/copy-images.sh
+  tags:
+    - platform-publish-docker
+  only:
+    - /^.*-release-branch$/
+
+scan:
+  stage: security
+  image: ${K8S_DEPLOY_TOOLS}
+  needs:
+    - compile
+  dependencies:
+    - compile
+  variables:
+    GIT_STRATEGY: none
+    UBER_YAML: $CI_PROJECT_DIR/out/_builds_ping-cloud-private-tenant_ping-cloud-base.yaml
+  allow_failure: true
+  script:
+    - kubescape scan --format json --format-version v2 --verbose --output report.json framework all $UBER_YAML
+  tags:
+    - platform-publish-docker
+  artifacts:
+    paths:
+    - report.json
+    expire_in: 1 year
+  only:
+    - /^.*-release-branch$/
+## end security stage ##
 
 ## Find cluster stage ##
 find-cluster:
@@ -60,6 +118,17 @@ deploy:
     - find-cluster
 
 ## Integration Test stage ##
+
+# Common pre-check tests
+pre-check:
+  stage: pre-check-test
+  tags:
+    - default-gitlab-runner-ping-cloud
+  image: ${K8S_DEPLOY_TOOLS}
+  script:
+    - ${SHARED_CI_SCRIPTS_DIR}/test/run-tests.sh pre-check
+  dependencies:
+    - find-cluster
 
 ## PA-WAS stage ##
 pa-was-integration-tests:
@@ -115,7 +184,7 @@ pa-was-integration-tests:
   - common
   - monitoring
   - health
-  
+
 .integration-tests-base:
   variables:
     TEST: ""
@@ -142,7 +211,7 @@ integration-tests:
     matrix:
       - TEST: *all-tests
   rules:
-    - if:  '$ENV_TYPE == null && $CI_PIPELINE_SOURCE != "schedule"'
+    - if: '$ENV_TYPE == null && $CI_PIPELINE_SOURCE != "schedule"'
 
 integration-tests-scheduled-pipeline:
   extends: .integration-tests-base
@@ -163,7 +232,7 @@ integration-tests-chub:
       - TEST: *chub-tests
   rules:
   - if: '$ENV_TYPE == "customer-hub"'
-      
+
 ## Chaos testing stage ##
 chaos-tests:
   stage: chaos

@@ -174,9 +174,9 @@ role.attribute.name=${PF_P14C_ROLE_ATTRIBUTE_NAME}
 #     role.admin.2=
 #     role.admin.3=
 #
-role.admin.1=${PF_P14C_ROLE_ADMIN_1}
-role.cryptoManager.1=${PF_P14C_ROLE_CRYPTOMANAGER_1}
-role.userAdmin.1=${PF_P14C_ROLE_USERADMIN_1}
+role.admin.1=${PF_P14C_ROLE_ADMIN}
+role.cryptoManager.1=${PF_P14C_ROLE_CRYPTOMANAGER}
+role.userAdmin.1=${PF_P14C_ROLE_USERADMIN}
 
 # The expressionAdmin role must only be granted to the administrators with admin role.
 role.expressionAdmin=${PF_P14C_ROLE_EXPRESSIONADMIN}

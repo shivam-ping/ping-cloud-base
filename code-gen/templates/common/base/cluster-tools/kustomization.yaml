@@ -6,7 +6,6 @@ resources:
 - cert-manager
 - cluster-autoscaler
 - ebs-driver
-- efs-driver
 - service-discovery
 - ingress
 - logging
@@ -16,6 +15,5 @@ resources:
 - pod-reaper
 - health
 - pgo
-- notification
 - karpenter
 - kube-downscaler

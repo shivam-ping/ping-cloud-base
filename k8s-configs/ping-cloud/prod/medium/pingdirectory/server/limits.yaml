@@ -10,7 +10,8 @@ spec:
       - name: pingdirectory
         resources:
           limits:
-            memory: 45Gi
+            memory: 60Gi
+            cpu: 10
           requests:
             memory: 45Gi
             cpu: 4
@@ -25,6 +26,9 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: out-dir
+      annotations:
+        # This annotation is required to prevent volume-autoscaler to resize this volume
+        volume.autoscaler.kubernetes.io/ignore: "true"
     spec:
       accessModes:
       - ReadWriteOnce

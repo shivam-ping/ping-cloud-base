@@ -1,7 +1,6 @@
 {
   "index_patterns": [
-    "pa-agent-audit-*",
-    "pa-was-agent-audit-*"
+    "pa-agent-audit-*"
   ],
   "template": {
     "settings": {
@@ -23,6 +22,9 @@
       "properties": {
         "@timestamp": {
           "type": "date"
+        },
+        "roundTripMS": {
+          "type": "integer"
         },
         "cluster_name": {
           "type": "text",
