@@ -1335,7 +1335,6 @@ for ENV_OR_BRANCH in ${SUPPORTED_ENVIRONMENT_TYPES}; do
     export IRSA_PD_ANNOTATION_KEY_VALUE=""
     export IRSA_PF_ANNOTATION_KEY_VALUE=""
     export IRSA_CWAGENT_ANNOTATION_KEY_VALUE=""
-    export IRSA_PGO_ANNOTATION_KEY_VALUE=""
 
     sed -i.bak -e "/disable-karpenter/ s|^#*|#|g" "${K8S_CONFIGS_DIR}/base/cluster-tools/karpenter/kustomization.yaml"
     sed -i.bak -e "/disable-kubedownscaler/ s|^#*|#|g" "${K8S_CONFIGS_DIR}/base/cluster-tools/kube-downscaler/kustomization.yaml"
