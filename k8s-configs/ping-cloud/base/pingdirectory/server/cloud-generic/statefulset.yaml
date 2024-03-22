@@ -162,7 +162,7 @@ spec:
               subPath: logger.lib.sh
             - name: pingdirectory-init
               mountPath: /wait-for-services.sh
-              subPath: wait-for-services.s
+              subPath: wait-for-services.sh
         - name: publish-pod-ip
           securityContext:
             runAsGroup: 9999
