@@ -163,20 +163,20 @@ spec:
             - name: pingdirectory-init
               mountPath: /wait-for-services.sh
               subPath: wait-for-services.sh
-        - name: publish-pod-ip
-          securityContext:
-            runAsGroup: 9999
-            runAsNonRoot: true
-            runAsUser: 9031
-            allowPrivilegeEscalation: false
-          image: public.ecr.aws/r2h3l6e4/pingcloud-services/toolkit:v1.19.0
-          imagePullPolicy: IfNotPresent
-          command: [ 'sh', '-c', 'echo "publish-pod-ip" && sleep 360s' ]
-          envFrom:
-            - configMapRef:
-                name: pingdirectory-environment-variables
-            - configMapRef:
-                name: pingcommon-environment-variables
+#        - name: publish-pod-ip
+#          securityContext:
+#            runAsGroup: 9999
+#            runAsNonRoot: true
+#            runAsUser: 9031
+#            allowPrivilegeEscalation: false
+#          image: public.ecr.aws/r2h3l6e4/pingcloud-apps/pingdirectory/dev:v1.19-release-branch-latest
+#          imagePullPolicy: IfNotPresent
+#          command: [ 'sh', '-c', 'echo "publish-pod-ip" && python --version && dig +short google.com A && sleep 360s' ]
+#          envFrom:
+#            - configMapRef:
+#                name: pingdirectory-environment-variables
+#            - configMapRef:
+#                name: pingcommon-environment-variables
       containers:
         - name: pingdirectory
           securityContext:
@@ -184,7 +184,7 @@ spec:
             runAsNonRoot: true
             runAsUser: 9031
             allowPrivilegeEscalation: false
-          image: public.ecr.aws/r2h3l6e4/pingcloud-apps/pingdirectory/dev:v1.19-release-branch-latest
+          image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/pingcloud-apps/pingdirectory:pdo-6734-dig
           imagePullPolicy: Always
           ports:
             - containerPort: 1389
