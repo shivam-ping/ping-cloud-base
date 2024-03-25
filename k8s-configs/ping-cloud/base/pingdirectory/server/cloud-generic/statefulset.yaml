@@ -407,7 +407,7 @@ spec:
             defaultMode: 0644
         - name: out-dir
           persistentVolumeClaim:
-            claimName: out-dir
+            claimName: shared-volume
         - name: pingdirectory-license
           secret:
             secretName: pingdirectory-license
@@ -433,7 +433,7 @@ spec:
             defaultMode: 0400
   volumeClaimTemplates:
     - metadata:
-        name: out-dir
+        name: shared-volume
         annotations:
           volume.autoscaler.kubernetes.io/ignore: "true"
         labels:
