@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: prometheus
+  name: prometheus-k8s
   namespace: prometheus
   annotations:
     $patch: delete
@@ -11,9 +11,16 @@ spec:
   $patch: replace
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Prometheus
 metadata:
-  name: prometheus
+  name: k8s
+  namespace: prometheus
+$patch: delete
+---
+apiVersion: apps/v1
+kind: PrometheusAgent
+metadata:
+  name: prometheus-agent
   namespace: prometheus
 $patch: delete
 ---
@@ -133,6 +140,13 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: prometheus-config
+  namespace: prometheus
+$patch: delete
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-agent-config
   namespace: prometheus
 $patch: delete
 ---

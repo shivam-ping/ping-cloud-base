@@ -8,3 +8,5 @@ resources:
 - grafana
 - grafana-operator/base
 - grafana-operator/controller
+- prometheus-operator/base
+- prometheus-operator/controller

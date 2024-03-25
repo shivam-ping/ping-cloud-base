@@ -3,10 +3,12 @@
 ### 2.0.0
 
 - Update version regexes from v*.*.*.* to v*.*.*
+- Replaced current Prometheus implementation with Prometheus Operator
 
 _Changes:_
 
 - [X] PDO-5729 Update version regexes
+- [X] PDO-6803 Replace current Prometheus implementation with Prometheus Operator
 
 ### 1.19.0.0
 
