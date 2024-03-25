@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: pingdirectory
-  namespace: ping-cloud
   labels:
     app: ping-cloud
     class: pingdirectory-server
