@@ -29,7 +29,7 @@ spec:
           secretName: pd-secrets
       initContainers:
         - name: pd-init
-          image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/geoff/pd:9.3.1-alpine-example
+          image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/geoff/pd:9.3.0.2-alpine-example-x86
           imagePullPolicy: Always # Set image pull policy to Always
           command: #["sh", "-c", "sleep 2000"]
             - "./entrypoint.sh"
@@ -72,7 +72,7 @@ spec:
 
       containers:
         - name: pingdirectory
-          image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/geoff/pd:9.3.1-alpine-example
+          image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/geoff/pd:9.3.0.2-alpine-example-x86
           imagePullPolicy: Always # Set image pull policy to Always
           ports:
             - containerPort: 1636 # Expose port 1636
