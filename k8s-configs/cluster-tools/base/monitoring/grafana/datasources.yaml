@@ -11,7 +11,7 @@ spec:
     name: prometheus
     type: prometheus
     access: proxy
-    url: http://prometheus:9090
+    url: http://prometheus-k8s:9090
     isDefault: true
     editable: true
     uid: P1809F7CD0C75ACF3

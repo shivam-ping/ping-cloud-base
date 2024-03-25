@@ -1,17 +1,15 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Prometheus
 metadata:
-  name: prometheus
+  name: k8s
   namespace: prometheus
 spec:
-  template:
-    spec:
-      containers:
-        - name: prometheus
-          resources:
-            limits:
-              cpu: “1500m”
-              memory: "4000Mi"
-            requests:
-              cpu: “1000m”
-              memory: "2000Mi"
+  containers:
+    - name: prometheus
+      resources:
+        limits:
+          cpu: “1500m”
+          memory: "4000Mi"
+        requests:
+          cpu: “1000m”
+          memory: "2000Mi"

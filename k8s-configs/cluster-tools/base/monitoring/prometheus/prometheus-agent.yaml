@@ -1,53 +1,95 @@
-# For more information on prometheus configuration go to https://prometheus.io/docs/prometheus/latest/configuration/configuration/
-apiVersion: apps/v1
-kind: Deployment
+---
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: PrometheusAgent
 metadata:
+  labels:
+    app.kubernetes.io/component: prometheus-agent
+    app.kubernetes.io/instance: prometheus-agent
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 2.50.1
+    app: prometheus
   name: prometheus-agent
   namespace: prometheus
-  labels:
-    app: prometheus-agent
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: prometheus-agent
-  template:
-    metadata:
-      labels:
-        app: prometheus-agent
-    spec:
-      serviceAccountName: prometheus
+  containers:
+    prometheus:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
         runAsGroup: 65534
-      containers:
-      - name: prometheus
-        image: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/prom/prometheus:v2.47.0
-        args:
-          - "--config.file=/etc/prometheus/prometheus.yml"
-          - "--web.enable-lifecycle"
-          - "--enable-feature=agent"
-          - "--enable-feature=expand-external-labels"
-        envFrom:
-          - configMapRef:
-              name: prometheus-environment-variables
-        volumeMounts:
-          - name: prometheus-config-volume
-            mountPath: /etc/prometheus/
-        ports:
-        - containerPort: 9090
-        resources:
-          limits:
-            cpu: 500m
-            memory: 4000Mi
-          requests:
-            cpu: 100m
-            memory: 512Mi
-      volumes:
+      envFrom:
+        - configMapRef:
+            name: prometheus-environment-variables
+      ports:
+      - containerPort: 9090
+      resources:
+        limits:
+          cpu: 500m
+          memory: 4000Mi
+        requests:
+          cpu: 100m
+          memory: 512Mi
+      volumeMounts:
       - name: prometheus-config-volume
-        configMap:
-          name: prometheus-agent-config
-
+        mountPath: /etc/prometheus/
+  volumes:
+  - name: prometheus-config-volume
+    configMap:
+      name: prometheus-agent-config
+  additionalArgs:
+  - name: "config.file"
+    value: "/etc/prometheus/prometheus.yml"
+  - name: "web.enable-lifecycle"
+  enableFeatures:
+  - agent
+  - expand-external-labels
+  replicas: 1
+  serviceAccountName: prometheus-agent
+  # serviceMonitorSelector:
+  #   matchLabels:
+  #     team: frontend
 
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus-agent
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus-agent
+rules:
+- apiGroups: [""]
+  resources:
+  - services
+  - endpoints
+  - pods
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources:
+  - configmaps
+  verbs: ["get"]
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus-agent
+subjects:
+- kind: ServiceAccount
+  name: prometheus-agent
+  namespace: prometheus

@@ -297,7 +297,7 @@ patchesJson6902:
 # Prometheus cross-region communication
 - target:
     kind: Service
-    name: prometheus
+    name: prometheus-k8s
     version: v1
   patch: |-
     - op: replace

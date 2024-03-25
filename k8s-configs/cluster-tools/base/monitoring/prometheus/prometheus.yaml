@@ -1,99 +1,143 @@
-# For more information on prometheus configuration go to https://prometheus.io/docs/prometheus/latest/configuration/configuration/
 ---
-apiVersion: apps/v1
-kind: StatefulSet
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
 metadata:
-  name: prometheus
-  namespace: prometheus
   labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 2.50.1
     app: prometheus
+  name: k8s
+  namespace: prometheus
 spec:
-  serviceName: prometheus
-  replicas: 1
-  selector:
-    matchLabels:
-      app: prometheus
-  template:
-    metadata:
-      labels:
-        app: prometheus
-    spec:
-      serviceAccountName: prometheus
+  containers:
+    prometheus:
       securityContext:
         fsGroup: 65534
         runAsNonRoot: true
         runAsUser: 65534
         runAsGroup: 65534
-      containers:
-      - name: prometheus
-        image: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/prom/prometheus:v2.47.0
-        args:
-          - "--config.file=/etc/prometheus/prometheus.yml"
-          - "--storage.tsdb.retention.time=$(PROMETHEUS_RETENTION_TIME)"
-          - "--web.enable-remote-write-receiver"
-          - "--enable-feature=memory-snapshot-on-shutdown"
-          - "--enable-feature=expand-external-labels"
-          - "--enable-feature=memory-snapshot-on-shutdown"
-        env:
-          - name: PROMETHEUS_RETENTION_TIME
-            valueFrom:
-              configMapKeyRef:
-                key: PROMETHEUS_RETENTION_TIME
-                name: prometheus-environment-variables
-        envFrom:
-          - configMapRef:
-              name: prometheus-environment-variables
-        volumeMounts:
-          - name: prometheus-config-volume
-            mountPath: /etc/prometheus/
-          - name: prometheus-storage-volume
-            mountPath: /prometheus/data
-
-        ports:
-        - containerPort: 9090
-        resources:
-          limits:
-            cpu: 1500m
-            memory: 5500Mi
-          requests:
-            cpu: 100m
-            memory: 2000Mi
-      volumes:
-      - name: prometheus-config-volume
-        configMap:
-          name: prometheus-config
-
-  volumeClaimTemplates:
-  - metadata:
-      name: prometheus-storage-volume
-      annotations:
-        volume.autoscaler.kubernetes.io/scale-above-percent: "80"
-        volume.autoscaler.kubernetes.io/scale-up-percent: "20"
-      labels:
-        app: prometheus
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: prometheus-gp3
+      env:
+      - name: PROMETHEUS_RETENTION_TIME
+        valueFrom:
+          configMapKeyRef:
+            key: PROMETHEUS_RETENTION_TIME
+            name: prometheus-environment-variables
+      envFrom:
+        - configMapRef:
+            name: prometheus-environment-variables
+      ports:
+      - containerPort: 9090
       resources:
+        limits:
+          cpu: 1500m
+          memory: 5500Mi
         requests:
-          storage: 30Gi
+          cpu: 100m
+          memory: 2000Mi
+      volumeMounts:
+      - name: prometheus-config-volume
+        mountPath: /etc/prometheus/
+      - name: prometheus-storage-volume
+        mountPath: /prometheus/data
+  externalLabels: {}
+  image: quay.io/prometheus/prometheus:v2.50.1
+  # image: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/prom/prometheus:v2.50.1
+  additionalArgs:
+  - name: "config.file"
+    value: "/etc/prometheus/prometheus.yml"
+  # This option enables remote-write-receiver feature
+  enableRemoteWriteReceiver: true
+  # This option overrides storage.tsdb.retention.time
+  retention: 15d
+  enableFeatures:
+  - expand-external-labels
+  - memory-snapshot-on-shutdown
+  nodeSelector:
+    kubernetes.io/os: linux
+  podMetadata:
+    labels:
+      app.kubernetes.io/component: prometheus
+      app.kubernetes.io/instance: k8s
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: kube-prometheus
+      app.kubernetes.io/version: 2.50.1
+      app: prometheus
+  # Thanos sidecar
+  thanos:
+    version: v0.34.0
+    image: quay.io/thanos/thanos:v0.34.0
+    # image: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/thanos:v0.34.0
+    objectStorageConfig:
+      key: thanos.yaml
+      name: thanos-objstore-config
+  disableCompaction: true
+  podMonitorNamespaceSelector: {}
+  podMonitorSelector: {}
+  probeNamespaceSelector: {}
+  probeSelector: {}
+  replicas: 1
+  ruleNamespaceSelector: {}
+  ruleSelector: {}
+  scrapeConfigNamespaceSelector: {}
+  scrapeConfigSelector: {}
+  serviceAccountName: prometheus-k8s
+  serviceMonitorNamespaceSelector: {}
+  serviceMonitorSelector: {}
+  version: 2.50.1
+  volumes:
+  - name: prometheus-config-volume
+    configMap:
+      name: prometheus-config
+  storage:
+    volumeClaimTemplate:
+      metadata:
+        name: prometheus-storage-volume
+        annotations:
+          volume.autoscaler.kubernetes.io/scale-above-percent: "80"
+          volume.autoscaler.kubernetes.io/scale-up-percent: "20"
+        labels:
+          app: prometheus
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: prometheus-gp3
+        resources:
+          requests:
+            storage: 30Gi
 
 ---
 
 kind: Service
 apiVersion: v1
 metadata:
-  name: prometheus
+  name: prometheus-k8s
   namespace: prometheus
+  labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 2.50.1
   annotations:
     external-dns.alpha.kubernetes.io/hostname: prometheus-central-dev.ping-demo.com
 spec:
   selector:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
     app: prometheus
   ports:
-  - port: 9090
-    name: prometheus
+  - name: web
+    port: 9090
+    targetPort: web
+  - name: reloader-web
+    port: 8080
+    targetPort: reloader-web
   clusterIP: None
+  sessionAffinity: ClientIP
 
 ---
 
@@ -101,7 +145,7 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: prometheus
+  name: prometheus-k8s
 rules:
 - apiGroups: [""]
   resources:
@@ -115,6 +159,10 @@ rules:
   resources:
   - configmaps
   verbs: ["get"]
+- apiGroups: [""]
+  resources:
+  - nodes/metrics
+  verbs: ["get"]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 - apiGroups: [ "" ]
@@ -126,7 +174,13 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: prometheus
+  labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 2.50.1
+  name: prometheus-k8s
   namespace: prometheus
 
 ---
@@ -134,13 +188,212 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: prometheus
+  labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 2.50.1
+  name: prometheus-k8s
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: prometheus
+  name: prometheus-k8s
 subjects:
 - kind: ServiceAccount
-  name: prometheus
+  name: prometheus-k8s
   namespace: prometheus
 
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 2.50.1
+  name: prometheus-k8s
+  namespace: prometheus
+spec:
+  egress:
+  - {}
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+    ports:
+    - port: 9090
+      protocol: TCP
+    - port: 8080
+      protocol: TCP
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus-adapter
+    ports:
+    - port: 9090
+      protocol: TCP
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: grafana
+    ports:
+    - port: 9090
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: prometheus
+      app.kubernetes.io/instance: k8s
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: kube-prometheus
+  policyTypes:
+  - Egress
+  - Ingress
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 2.50.1
+  name: prometheus-k8s
+  namespace: prometheus
+spec:
+  endpoints:
+  - interval: 30s
+    port: web
+  - interval: 30s
+    port: reloader-web
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: prometheus
+      app.kubernetes.io/instance: k8s
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: kube-prometheus
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 2.50.1
+  name: prometheus-k8s
+  namespace: prometheus
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: prometheus
+      app.kubernetes.io/instance: k8s
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: kube-prometheus
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 2.50.1
+  name: prometheus-k8s-config
+  namespace: prometheus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prometheus-k8s-config
+subjects:
+- kind: ServiceAccount
+  name: prometheus-k8s
+  namespace: prometheus
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBindingList
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    labels:
+      app.kubernetes.io/component: prometheus
+      app.kubernetes.io/instance: k8s
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: kube-prometheus
+      app.kubernetes.io/version: 2.50.1
+    name: prometheus-k8s
+    namespace: default
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: prometheus-k8s
+  subjects:
+  - kind: ServiceAccount
+    name: prometheus-k8s
+    namespace: prometheus
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    labels:
+      app.kubernetes.io/component: prometheus
+      app.kubernetes.io/instance: k8s
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: kube-prometheus
+      app.kubernetes.io/version: 2.50.1
+    name: prometheus-k8s
+    namespace: kube-system
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: prometheus-k8s
+  subjects:
+  - kind: ServiceAccount
+    name: prometheus-k8s
+    namespace: prometheus
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    labels:
+      app.kubernetes.io/component: prometheus
+      app.kubernetes.io/instance: k8s
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: kube-prometheus
+      app.kubernetes.io/version: 2.50.1
+    name: prometheus-k8s
+    namespace: prometheus
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: prometheus-k8s
+  subjects:
+  - kind: ServiceAccount
+    name: prometheus-k8s
+    namespace: prometheus
+
+---
+# Thanos sidecar object storage configuration
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: thanos-objstore-config
+  namespace: prometheus
+stringData:
+  thanos.yaml: |
+    type: s3
+    config:
+      bucket: thanos-bucket
+      endpoint: s3.us-east-2.amazonaws.com
