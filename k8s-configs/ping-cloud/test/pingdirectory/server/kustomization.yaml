@@ -8,7 +8,7 @@ commonLabels:
   role: pingdirectory
 
 resources:
-- ../../../base/pingdirectory/server/aws
+- ../../../base/pingdirectory/cloud-generic
 
-patchesStrategicMerge:
-- wait-for-service.yaml
+#patchesStrategicMerge:
+#- wait-for-service.yaml
