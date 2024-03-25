@@ -1,0 +1,130 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pingdirectory
+  namespace: ping-cloud
+  labels:
+    app: ping-cloud
+    class: pingdirectory-server
+    role: pingdirectory
+spec:
+  serviceName: "pingdirectory"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pingdirectory
+  template:
+    metadata:
+      labels:
+        app: pingdirectory
+    spec:
+      terminationGracePeriodSeconds: 30 # Set stop grace period to 30 seconds
+      securityContext:
+        fsGroup: 999
+      volumes:
+      - name: pd-license
+        secret:
+          secretName: pd-license
+      - name: pd-secrets
+        secret:
+          secretName: pd-secrets
+      initContainers:
+        - name: pd-init
+          image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/geoff/pd:9.3.1-alpine-example
+          imagePullPolicy: Always # Set image pull policy to Always
+          command: #["sh", "-c", "sleep 2000"]
+            - "./entrypoint.sh"
+          env:
+            - name: OUT_CONFIG_DIR
+              value: "/out/data/config"
+            - name: OUT_DB_DIR
+              value: "/out/data/db"
+            - name: OUT_DIR
+              value: "/out/data"
+            - name: REGION
+              value: "us-west-2"
+            - name: RESTART_STRATEGY
+              value: "none"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: LOCAL_INSTANCE_NAME
+              value: $(POD_NAME)-$(REGION_NICK_NAME)
+            - name: SECRETS_SOURCE_DIR
+              value: "/secrets"
+            - name: SECRETS_TARGET_DIR
+              value: "/sharedSecrets"
+          envFrom:
+            - configMapRef:
+                name: pd-common-config
+            - configMapRef:
+                name: global-config
+          volumeMounts:
+            - name: shared-volume
+              mountPath: /out/data
+            - name: pd-license
+              mountPath: /opt/pingidentity/license/
+            - name: pd-secrets
+              mountPath: /secrets
+              readOnly: true
+            - name: shared-secrets
+              mountPath: /sharedSecrets
+
+      containers:
+        - name: pingdirectory
+          image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/geoff/pd:9.3.1-alpine-example
+          imagePullPolicy: Always # Set image pull policy to Always
+          ports:
+            - containerPort: 1636 # Expose port 1636
+            - containerPort: 8989 # Expose port 8989
+          # command: ["sh", "-c", "sleep 2000"]
+          envFrom:
+            - configMapRef:
+                name: pd-common-config
+          env:
+            - name: REGION
+              value: "us-west-2"
+            - name: PRIMARY_REGION
+              value: "us-west-2"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: LDAPS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: pd-default-config
+                  key: LDAPS_PORT
+            - name: PD_INIT_SOURCE
+              value: "10.0.3.35"
+            - name: SECRETS_DIR
+              value: /secrets
+          volumeMounts:
+            - name: shared-volume
+              mountPath: /opt/pingidentity/runtime/config
+              subPath: ./config
+            - name: shared-volume
+              mountPath: /out/data
+            - name: shared-secrets
+              mountPath: /secrets
+
+  volumeClaimTemplates:
+    - metadata:
+        name: shared-volume
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: pingdirectory-gp3
+        resources:
+          requests:
+            storage: 50Gi
+    - metadata:
+        name: shared-secrets
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: pingdirectory-gp3
+        resources:
+          requests:
+            storage: 1Gi

@@ -8,8 +8,7 @@ commonLabels:
   role: pingdirectory
 
 resources:
+- hack-configmaps.yaml
+- hack-secrets.yaml
 - storage.yaml
-- statefulset.yaml
-- service.yaml
-- ingress.yaml
-- disruption-budget.yaml
+- hack-pd.yaml

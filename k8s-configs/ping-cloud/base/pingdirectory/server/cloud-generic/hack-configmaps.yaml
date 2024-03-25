@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pd-default-config
+  namespace: ping-cloud
+data:
+  LDAPS_PORT: "1636"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pd-common-config
+  namespace: ping-cloud
+data:
+  ROOT_USER_PASSWORD_FILE: password.txt
+  ADMIN_PASSWORD_FILE: admin-password.txt
+  ENCRYPTION_PASSWORD_FILE: encryption-password.txt
+  ADS_CERT_FILE: ads_cert.pem
+  ADS_KEY_FILE: ads_key.pem
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: global-config
+  namespace: ping-cloud
+data:
+  REGION_NICK_NAME: us-west-2
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pd-restart-strategy
+  namespace: ping-cloud
+data:
+  RESTART_STRATEGY: ''
