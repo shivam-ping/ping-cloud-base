@@ -27,9 +27,12 @@ spec:
       - name: pd-secrets
         secret:
           secretName: pd-secrets
+      - name: out-dir
+        persistentVolumeClaim:
+          claimName: out-dir
       initContainers:
         - name: pd-init
-          image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/geoff/pd:9.3.0.2-alpine-example-x86
+          image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/geoff/pd:10.0.0.2-alpine-example
           imagePullPolicy: Always # Set image pull policy to Always
           command: #["sh", "-c", "sleep 2000"]
             - "./entrypoint.sh"
@@ -60,16 +63,13 @@ spec:
             - configMapRef:
                 name: global-config
           volumeMounts:
-            - name: shared-volume
+            - name: out-dir
               mountPath: /out/data
             - name: pd-license
               mountPath: /opt/pingidentity/license/
             - name: pd-secrets
               mountPath: /secrets
               readOnly: true
-            - name: shared-secrets
-              mountPath: /sharedSecrets
-
       containers:
         - name: pingdirectory
           image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/geoff/pd:9.3.0.2-alpine-example-x86
@@ -100,17 +100,14 @@ spec:
             - name: SECRETS_DIR
               value: /secrets
           volumeMounts:
-            - name: shared-volume
+            - name: out-dir
               mountPath: /opt/pingidentity/runtime/config
               subPath: ./config
-            - name: shared-volume
+            - name: out-dir
               mountPath: /out/data
-            - name: shared-secrets
-              mountPath: /secrets
-
   volumeClaimTemplates:
     - metadata:
-        name: shared-volume
+        name: out-dir
       spec:
         accessModes:
           - ReadWriteOnce
@@ -118,12 +115,3 @@ spec:
         resources:
           requests:
             storage: 50Gi
-    - metadata:
-        name: shared-secrets
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        storageClassName: pingdirectory-gp3
-        resources:
-          requests:
-            storage: 1Gi
