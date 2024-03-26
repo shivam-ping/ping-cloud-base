@@ -124,6 +124,13 @@ spec:
         - name: pingdirectory
           image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/geoff/pd:10.0.0.2-alpine-example
           imagePullPolicy: Always # Set image pull policy to Always
+          resources:
+            limits:
+              memory: "12Gi"
+              cpu: "3"
+            requests:
+              memory: "12Gi"
+              cpu: "2"
           ports:
             - containerPort: 1636 # Expose port 1636
             - containerPort: 8989 # Expose port 8989
