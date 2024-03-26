@@ -4,6 +4,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: pingdirectory
+  namespace: ping-cloud
   labels:
     class: pingdirectory-server
 spec:
@@ -121,7 +122,7 @@ spec:
               readOnly: true
       containers:
         - name: pingdirectory
-          image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/geoff/pd:9.3.0.2-alpine-example-x86
+          image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/geoff/pd:10.0.0.2-alpine-example
           imagePullPolicy: Always # Set image pull policy to Always
           ports:
             - containerPort: 1636 # Expose port 1636
