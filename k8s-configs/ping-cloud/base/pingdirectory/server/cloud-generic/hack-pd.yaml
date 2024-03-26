@@ -87,6 +87,8 @@ spec:
           command: #["sh", "-c", "sleep 2000"]
             - "./entrypoint.sh"
           env:
+            - name: LICENSE_KEY_FILE
+              value: "/opt/data/PD.license"
             - name: OUT_CONFIG_DIR
               value: "/out/data/config"
             - name: OUT_DB_DIR
@@ -115,8 +117,6 @@ spec:
           volumeMounts:
             - name: out-dir
               mountPath: /out/data
-            - name: pd-license
-              mountPath: /opt/pingidentity/license/
             - name: pd-secrets
               mountPath: /secrets
               readOnly: true
