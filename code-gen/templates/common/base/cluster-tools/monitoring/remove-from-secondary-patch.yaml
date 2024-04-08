@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: prometheus-k8s
+  name: prometheus
   namespace: prometheus
   annotations:
     $patch: delete
@@ -13,16 +13,16 @@ spec:
 apiVersion: apps/v1
 kind: Prometheus
 metadata:
-  name: k8s
+  name: prometheus
   namespace: prometheus
 $patch: delete
----
-apiVersion: apps/v1
-kind: PrometheusAgent
-metadata:
-  name: prometheus-agent
-  namespace: prometheus
-$patch: delete
+#---
+#apiVersion: apps/v1
+#kind: PrometheusAgent
+#metadata:
+#  name: prometheus-agent
+#  namespace: prometheus
+#$patch: delete
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard

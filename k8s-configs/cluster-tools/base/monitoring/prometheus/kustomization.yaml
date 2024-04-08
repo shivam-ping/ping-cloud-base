@@ -3,18 +3,27 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 namespace: prometheus
 
 resources:
-- storage.yaml
-- volume-autoscaler
-- namespace.yaml
-- prometheus.yaml
-- prometheus-job-exporter.yaml
-- prometheus-config.yaml
-- prometheus-agent-config.yaml
-- prometheus-agent.yaml
-- opsgenie-key.yaml
+  - prometheus.yaml
+  - rbac.yaml
+  - prometheus-scrape-config.yaml
+  - apiservers-service-monitor.yaml
+  - prometheus-agent.yaml
+  - prometheus-service.yaml
+  - ksm-service-monitor.yaml
+  - nodes-scrape-config.yaml
+  - cadvisor-scrape-config.yaml
+  - generic-service-monitor.yaml
+  - generic-pod-monitor.yaml
+  - volume-autoscaler
+  - namespace.yaml
+  - storage.yaml
+  - secret.yaml
+  - opsgenie-key.yaml
 
 configMapGenerator:
 - name: prometheus-environment-variables
+  options:
+    disableNameSuffixHash: true
   envs:
     - env_vars
 
@@ -31,7 +40,7 @@ patchesJson6902:
       path: /rules/0
       value:
         apiGroups:
-          - "" 
+          - ""
         resources:
           - persistentvolumeclaims
         verbs:

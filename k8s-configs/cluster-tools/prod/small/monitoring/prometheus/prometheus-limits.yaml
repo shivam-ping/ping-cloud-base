@@ -1,15 +1,13 @@
-apiVersion: apps/v1
+apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
-  name: k8s
+  name: prometheus
   namespace: prometheus
 spec:
-  containers:
-    - name: prometheus
-      resources:
-        limits:
-          cpu: “1000m”
-          memory: "3000Mi"
-        requests:
-          cpu: “100m”
-          memory: "1500Mi"
+  resources:
+    limits:
+      cpu: “1000m”
+      memory: "3000Mi"
+    requests:
+      cpu: “100m”
+      memory: "1500Mi"

@@ -1,12 +1,5 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: prometheus
 resources:
-- clusterrole.yaml
-- clusterrolebinding.yaml
-- deployment.yaml
-- networkpolicy.yaml
-- prometheusrule.yaml
-- persistentvolumeclaim.yaml
-- service.yaml
-- serviceaccount.yaml
-- servicemonitor.yaml
+  - operator.yaml
