@@ -3,22 +3,22 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 namespace: prometheus
 
 resources:
-  - prometheus.yaml
-  - rbac.yaml
-  - prometheus-scrape-config.yaml
   - apiservers-service-monitor.yaml
-  - prometheus-agent.yaml
-  - prometheus-service.yaml
-  - ksm-service-monitor.yaml
-  - nodes-scrape-config.yaml
   - cadvisor-scrape-config.yaml
-  - generic-service-monitor.yaml
   - generic-pod-monitor.yaml
-  - volume-autoscaler
+  - generic-service-monitor.yaml
+  - ksm-service-monitor.yaml
   - namespace.yaml
-  - storage.yaml
-  - secret.yaml
+  - nodes-scrape-config.yaml
   - opsgenie-key.yaml
+  - prometheus.yaml
+  - prometheus-agent.yaml
+  - prometheus-scrape-config.yaml
+  - prometheus-service.yaml
+  - rbac.yaml
+  - secret.yaml
+  - storage.yaml
+  - volume-autoscaler
 
 configMapGenerator:
 - name: prometheus-environment-variables
@@ -26,24 +26,3 @@ configMapGenerator:
     disableNameSuffixHash: true
   envs:
     - env_vars
-
-patchesJson6902:
-
-# Fix "User system:serviceaccount:prometheus:volume persistentvolumeclaims is forbidden" issue occured to k8s-volume-autoscaler
-- target:
-    group: rbac.authorization.k8s.io
-    version: v1
-    kind: ClusterRole
-    name: prometheus-k8s
-  patch: |
-    - op: add
-      path: /rules/0
-      value:
-        apiGroups:
-          - ""
-        resources:
-          - persistentvolumeclaims
-        verbs:
-          - get
-          - list
-          - watch
