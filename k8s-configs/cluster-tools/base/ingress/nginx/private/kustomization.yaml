@@ -35,9 +35,6 @@ patches:
     version: v1
     kind: ConfigMap
     name: nginx-configuration
-
-# Add annotation to IngressClass
-patches:
 - target:
     kind: IngressClass
     name: nginx-private
