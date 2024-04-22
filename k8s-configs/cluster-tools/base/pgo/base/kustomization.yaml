@@ -18,9 +18,7 @@ images:
 # Patch the CRDs such that argocd will sync them properly
 patches:
   - target:
-      version: v1
-      kind: CustomResourceDefinition
-      name: postgresclusters.postgres-operator.crunchydata.com
+      labelSelector: "app.kubernetes.io/name=postgresclusters.postgres-operator.crunchydata.com"
     patch: |-
       - op: add
         path: /metadata/annotations/argocd.argoproj.io~1sync-options
@@ -33,3 +31,40 @@ patches:
       - op: add
         path: /metadata/annotations/argocd.argoproj.io~1sync-options
         value: "Replace=true"
+
+
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: pgo
+      spec:
+        template:
+          spec:
+            containers:
+            - name: operator
+              resources:
+                requests:
+                  memory: "100Mi"
+                  cpu: "10m"
+                limits:
+                  memory: "150Mi"
+                  cpu: "30m"
+
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: pgo-upgrade
+      spec:
+        template:
+          spec:
+            containers:
+            - name: operator
+              resources:
+                requests:
+                  memory: "50Mi"
+                  cpu: "10m"
+                limits:
+                  memory: "100Mi"
+                  cpu: "30m"

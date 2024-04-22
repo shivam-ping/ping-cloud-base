@@ -181,7 +181,7 @@ configMapGenerator:
     - ../base/env_vars
     - env_vars
 
-patchesStrategicMerge:
+patches:
 
 ### MANUAL UPDATES SECTION - START
 
@@ -195,48 +195,48 @@ patchesStrategicMerge:
 #   - set HEALTHCHECKS_ENABLED=true in base/env_vars
 #   - re-spin pa and pa-was admin pods when argocd syncs these changes
 
-  - ../base/cluster-tools/health/disable-all-healthchecks.yaml
+  - path: ../base/cluster-tools/health/disable-all-healthchecks.yaml
 
 ### MANUAL UPDATES SECTION - END
 
 ### PS/GSO customizations to OOTB resources should only go into this file. Otherwise, CSR auto-updates will break. ###
-  - custom-patches.yaml
+  - path: custom-patches.yaml
 
   ### Regional enablement - remove admins, backups, etc. from secondary ###
   ### The removal of these patches is handled automatically via generate-cluster-state script, manual toggling is not needed ###
 
-  - ../base/ping-cloud/pingdirectory/server/remove-from-secondary-patch.yaml
+  - path: ../base/ping-cloud/pingdirectory/server/remove-from-secondary-patch.yaml
 
-  - ../base/ping-cloud/pingaccess-was/admin/remove-from-secondary-patch.yaml
-  - ../base/ping-cloud/pingaccess-was/engine/remove-from-secondary-patch.yaml
+  - path: ../base/ping-cloud/pingaccess-was/admin/remove-from-secondary-patch.yaml
+  - path: ../base/ping-cloud/pingaccess-was/engine/remove-from-secondary-patch.yaml
 
-  - ../base/ping-cloud/pingfederate/admin/remove-from-secondary-patch.yaml
-  - ../base/ping-cloud/pingaccess/admin/remove-from-secondary-patch.yaml
+  - path: ../base/ping-cloud/pingfederate/admin/remove-from-secondary-patch.yaml
+  - path: ../base/ping-cloud/pingaccess/admin/remove-from-secondary-patch.yaml
 
-  - ../base/ping-cloud/pingcommon/remove-from-secondary-patch.yaml
+  - path: ../base/ping-cloud/pingcommon/remove-from-secondary-patch.yaml
 
-  - ../base/ping-cloud/pingdatasync/server/remove-from-secondary-patch.yaml
-  - ../base/cluster-tools/monitoring/remove-from-secondary-patch.yaml
-  - ../base/cluster-tools/logging/remove-from-secondary-patch.yaml
-  - ../base/cluster-tools/health/remove-from-secondary-patch.yaml
+  - path: ../base/ping-cloud/pingdatasync/server/remove-from-secondary-patch.yaml
+  - path: ../base/cluster-tools/monitoring/remove-from-secondary-patch.yaml
+  - path: ../base/cluster-tools/logging/remove-from-secondary-patch.yaml
+  - path: ../base/cluster-tools/health/remove-from-secondary-patch.yaml
 
   ### The removal of these patches is handled automatically via git-ops-command.sh script, manual toggling is not needed ###
 
-  - pingaccess/ff-external-ingress/remove-external-ingress.yaml
-  - pingdelegator/ff-external-ingress/remove-external-ingress.yaml
-  - pingdirectory/ff-external-ingress/remove-external-ingress.yaml
-  - pingfederate/ff-external-ingress/remove-external-ingress.yaml
+  - path: pingaccess/ff-external-ingress/remove-external-ingress.yaml
+  - path: pingdelegator/ff-external-ingress/remove-external-ingress.yaml
+  - path: pingdirectory/ff-external-ingress/remove-external-ingress.yaml
+  - path: pingfederate/ff-external-ingress/remove-external-ingress.yaml
   ### The patch is copied from pingcommon
-  - ../base/ping-cloud/pingaccess-was/ff-external-ingress/remove-external-ingress.yaml
+  - path: ../base/ping-cloud/pingaccess-was/ff-external-ingress/remove-external-ingress.yaml
 
-  #- ../base/ping-cloud/pingfederate/provisioning/remove-from-secondary-patch.yaml
+  #- path: ../base/ping-cloud/pingfederate/provisioning/remove-from-secondary-patch.yaml
 
   ### Developer CDE Environments - the following will be UNCOMMENTED if we are in a developer CDE
 
   ### CloudWatch is disabled by default in developer CDEs for cost savings
   ### If you want CloudWatch enabled in a developer CDE, make sure the below is commented out *in your CSR*
-  # - ../base/cluster-tools/monitoring/remove-from-developer-cde-patch.yaml
+  # - path: ../base/cluster-tools/monitoring/remove-from-developer-cde-patch.yaml
 
   ### NR and CW logging are disabled by default in developer CDEs
   ### If you want NR and CW logging enabled in a developer CDE, make sure the below is commented out *in your CSR*
-  # - ../base/cluster-tools/logging/remove-from-developer-cde-patch.yaml
+  # - path: ../base/cluster-tools/logging/remove-from-developer-cde-patch.yaml
