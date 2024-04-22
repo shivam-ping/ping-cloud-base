@@ -12,7 +12,7 @@ resources:
 patchesStrategicMerge:
 - admin-limits.yaml
 
-patchesJson6902:
+patches:
   - target:
       group: apps
       version: v1

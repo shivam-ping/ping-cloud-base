@@ -18,7 +18,7 @@ configMapGenerator:
   envs:
     - env_vars
 
-patchesJson6902:
+patches:
 
 # Fix "User system:serviceaccount:prometheus:volume persistentvolumeclaims is forbidden" issue occured to k8s-volume-autoscaler
 - target:

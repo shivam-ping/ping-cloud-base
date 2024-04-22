@@ -280,7 +280,7 @@ patchesStrategicMerge:
               - name: "PROMETHEUS_LABEL_MATCH"
                 value: "k8s_cluster_name=\"${CLUSTER_NAME}-${TENANT_NAME}-${REGION_NICK_NAME}\""
 
-patchesJson6902:
+patches:
 
 # Newrelic resources
 - target:

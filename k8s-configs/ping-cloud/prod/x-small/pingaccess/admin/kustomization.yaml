@@ -13,7 +13,7 @@ patchesStrategicMerge:
 - admin-init-env.yaml
 - admin-limits.yaml
 
-patchesJson6902:
+patches:
 - target:
     group: apps
     version: v1

@@ -10,7 +10,7 @@ images:
   newName: ${ECR_REGISTRY_NAME}/pingcloud-apps/pingaccess${ECR_ENV}
   newTag: ${PINGACCESS_IMAGE_TAG}
 
-patchesJson6902:
+patches:
 
 ### PingAccess Engine Last Update Config Map ###
 - target:

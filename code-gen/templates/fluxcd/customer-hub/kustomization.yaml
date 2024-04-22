@@ -52,7 +52,7 @@ patchesStrategicMerge:
           - name: argocd-p1as-oauth
             $patch: delete
 
-patchesJson6902:
+patches:
 
 ### Cluster state repo URL and auth configuration for the CD tool ###
 - target:

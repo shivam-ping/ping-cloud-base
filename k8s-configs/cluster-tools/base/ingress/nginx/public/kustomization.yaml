@@ -24,7 +24,7 @@ configMapGenerator:
     - SSM_PATH_DHPARAM=/pcpt/beluga/ingress-keys/ingress-nginx-public"
     - REGION=${REGION}
 
-patchesJson6902:
+patches:
 - path: add-deployment-args.yaml
   target:
     group: apps

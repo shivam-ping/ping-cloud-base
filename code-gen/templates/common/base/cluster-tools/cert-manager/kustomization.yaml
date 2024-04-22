@@ -77,7 +77,7 @@ patchesStrategicMerge:
       purpose: service-account-for-cert-manager-webhook
       ${IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE}
 
-patchesJson6902:
+patches:
 
 # Change the namespace of the ACME certificate to the ping-cloud namespace
 - target:

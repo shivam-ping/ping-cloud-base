@@ -10,7 +10,7 @@ images:
   newName: ${ECR_REGISTRY_NAME}/pingcloud-apps/pingdatasync${ECR_ENV}
   newTag: ${PINGDATASYNC_IMAGE_TAG}
 
-patchesJson6902:
+patches:
 
 ### pingdatasync Last Update Config Map ###
 - target:

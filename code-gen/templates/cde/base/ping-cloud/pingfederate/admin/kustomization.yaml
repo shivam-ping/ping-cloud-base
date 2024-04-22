@@ -28,7 +28,7 @@ patchesStrategicMerge:
     annotations:
       ${IRSA_PING_ANNOTATION_KEY_VALUE}
       
-patchesJson6902:
+patches:
 
 ### PingFederate Admin Last Update Config Map ###
 - target:

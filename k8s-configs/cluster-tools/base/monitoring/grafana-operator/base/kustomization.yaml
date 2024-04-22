@@ -4,7 +4,7 @@ resources:
 - crds.yaml
 
 # Patch the CRDs such that argocd will sync them properly
-patchesJson6902:
+patches:
   - target:
       version: v1
       kind: CustomResourceDefinition

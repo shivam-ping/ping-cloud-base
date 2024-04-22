@@ -74,7 +74,7 @@ patchesStrategicMerge:
       ${IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE}
 
 
-patchesJson6902:
+patches:
 - target:
     kind: Service
     name: opensearch-ingest

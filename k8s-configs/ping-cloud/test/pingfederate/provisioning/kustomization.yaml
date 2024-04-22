@@ -10,7 +10,7 @@ resources:
 - ../../../base/pingfederate/provisioning/aws
 
 
-patchesJson6902:
+patches:
 # Change the number of pingfederate provisioning replicas to 2 for dev/test environments
 - target:
     group: postgres-operator.crunchydata.com

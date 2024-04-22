@@ -17,7 +17,7 @@ commonLabels:
   app.kubernetes.io/role: ingress-nginx-private
   app.kubernetes.io/version: 1.9.6
 
-patchesJson6902:
+patches:
 - path: add-deployment-args.yaml
   target:
     group: apps

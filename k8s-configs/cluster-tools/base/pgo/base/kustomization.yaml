@@ -16,7 +16,7 @@ images:
     newName: public.ecr.aws/r2h3l6e4/pingcloud-clustertools/crunchydata/postgres-operator-upgrade
 
 # Patch the CRDs such that argocd will sync them properly
-patchesJson6902:
+patches:
   - target:
       version: v1
       kind: CustomResourceDefinition
