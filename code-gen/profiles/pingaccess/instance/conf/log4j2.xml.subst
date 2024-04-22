@@ -61,85 +61,85 @@
         <!-- Changes to this section will not be required to effectively troubleshoot PingAccess -->
         <AsyncLogger name="com.netflix" level="WARN" additivity="false" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="com.netflix.config.sources.URLConfigurationSource" level="FATAL" additivity="false"
                      includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="net.sf.ehcache" level="WARN" additivity="false" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="net.sf.ehcache.config.CacheConfiguration" level="ERROR" additivity="false"
                      includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="org.springframework" level="WARN" additivity="false" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="org.springframework.orm.jpa" level="WARN" additivity="false" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="org.hibernate" level="WARN" additivity="false" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="org.hibernate.orm.deprecation" level="FATAL" additivity="false" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="org.hibernate.cache.ehcache.AbstractEhcacheRegionFactory" level="ERROR" additivity="false" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="org.hibernate.jpa.internal.util.LogHelper" level="FATAL" additivity="false"
                      includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="org.apache.http" level="WARN" additivity="false" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="java.sql.DatabaseMetaData" level="WARN" additivity="false" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="com.wordnik.swagger" level="WARN" additivity="false" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="io.netty" level="WARN" additivity="false" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="org.jose4j.jwe.kdf" level="WARN" additivity="false" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
         <AsyncLogger name="org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator" level="ERROR" additivity="false" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncLogger>
 
@@ -148,7 +148,7 @@
         <!-- ======================= -->
         <AsyncRoot level="INFO" includeLocation="false">
             <AppenderRef ref="File"/>
-            <AppenderREf ref="CONSOLE-PA"/>
+            <AppenderRef ref="CONSOLE-PA"/>
             <!--<AppenderRef ref="CONSOLE-SIEM"/>-->
         </AsyncRoot>
 
@@ -544,17 +544,24 @@
         </RollingFile>
         <Console name="CONSOLE-ENGINE-AUDIT_PA" >
           <JSONLayout complete="true" compact="true" eventEol="true" objectMessageAsJsonObject="true" properties="false">
-            <KeyValuePair key="timestamp" value="$${date:yyyy-MM-dd HH:mm:ss,S}"/>
-            <KeyValuePair key="exchangeId" value="$${ctx:exchangeId:-}"/>
-            <KeyValuePair key="trackingId" value="$${ctx:AUDIT.trackingId:-}"/>
-            <KeyValuePair key="roundTripMS" value="$${ctx:AUDIT.roundTripMS:-} ms"/>
-            <KeyValuePair key="subject" value="$${ctx:AUDIT.subject:-}"/>
-            <KeyValuePair key="authMech" value="$${ctx:AUDIT.authMech:-}"/>
-            <KeyValuePair key="client" value="$${ctx:AUDIT.client:-}"/>
-            <KeyValuePair key="method" value="$${ctx:AUDIT.method:-}"/>
-            <KeyValuePair key="requestUri" value="$${ctx:AUDIT.requestUri:-}"/>
-            <KeyValuePair key="responseCode" value="$${ctx:AUDIT.responseCode:-}"/>
-            <KeyValuePair key="log_name" value="engine-audit" />
+              <KeyValuePair key="timestamp" value="$${date:yyyy-MM-dd HH:mm:ss,S}"/>
+              <KeyValuePair key="exchangeId" value="$${ctx:exchangeId:-}"/>
+              <KeyValuePair key="trackingId" value="$${ctx:AUDIT.trackingId:-}"/>
+              <KeyValuePair key="roundTripMS" value="$${ctx:AUDIT.roundTripMS:-} ms"/>
+              <KeyValuePair key="proxyRoundTripMS" value="$${ctx:AUDIT.proxyRoundTripMS:-} ms"/>
+              <KeyValuePair key="resource" value="$${ctx:AUDIT.resource:-}"/>
+              <KeyValuePair key="subject" value="$${ctx:AUDIT.subject:-}"/>
+              <KeyValuePair key="authMech" value="$${ctx:AUDIT.authMech:-}"/>
+              <KeyValuePair key="client" value="$${ctx:AUDIT.client:-}"/>
+              <KeyValuePair key="method" value="$${ctx:AUDIT.method:-}"/>
+              <KeyValuePair key="requestUri" value="$${ctx:AUDIT.requestUri:-}"/>
+              <KeyValuePair key="responseCode" value="$${ctx:AUDIT.responseCode:-}"/>
+              <KeyValuePair key="failedRuleType" value="$${ctx:AUDIT.failedRuleType:-}"/>
+              <KeyValuePair key="failedRuleName" value="$${ctx:AUDIT.failedRuleName:-}"/>
+              <KeyValuePair key="applicationName" value="$${ctx:AUDIT.applicationName:-}"/>
+              <KeyValuePair key="resourceName" value="$${ctx:AUDIT.resourceName:-}"/>
+              <KeyValuePair key="pathPrefix" value="$${ctx:AUDIT.pathPrefix:-}"/>
+              <KeyValuePair key="log_name" value="engine-audit" />
           </JSONLayout>
         </Console>
         <!-- Engine Audit log : JDBC appender template for Oracle
@@ -808,16 +815,19 @@
         </RollingFile>
         <Console name="CONSOLE-AGENT-AUDIT_PA" >
           <JSONLayout complete="true" compact="true" eventEol="true" objectMessageAsJsonObject="true" properties="false">
-            <KeyValuePair key="timestamp" value="$${date:yyyy-MM-dd HH:mm:ss,S}"/>
-            <KeyValuePair key="exchangeId" value="$${ctx:exchangeId:-}"/>
-            <KeyValuePair key="trackingId" value="$${ctx:AUDIT.trackingId:-}"/>
-            <KeyValuePair key="roundTripMS" value="$${ctx:AUDIT.roundTripMS:-} ms"/>
-            <KeyValuePair key="resource" value="$${ctx:AUDIT.resource:-}"/>
-            <KeyValuePair key="client" value="$${ctx:AUDIT.client:-}"/>
-            <KeyValuePair key="method" value="$${ctx:AUDIT.method:-}"/>
-            <KeyValuePair key="requestUri" value="$${ctx:AUDIT.requestUri:-}"/>
-            <KeyValuePair key="responseCode" value="$${ctx:AUDIT.responseCode:-}"/>
-            <KeyValuePair key="log_name" value="agent-audit" />
+              <KeyValuePair key="timestamp" value="$${date:yyyy-MM-dd HH:mm:ss,S}"/>
+              <KeyValuePair key="exchangeId" value="$${ctx:exchangeId:-}"/>
+              <KeyValuePair key="trackingId" value="$${ctx:AUDIT.trackingId:-}"/>
+              <KeyValuePair key="roundTripMS" value="$${ctx:AUDIT.roundTripMS:-} ms"/>
+              <KeyValuePair key="resource" value="$${ctx:AUDIT.resource:-}"/>
+              <KeyValuePair key="client" value="$${ctx:AUDIT.client:-}"/>
+              <KeyValuePair key="method" value="$${ctx:AUDIT.method:-}"/>
+              <KeyValuePair key="requestUri" value="$${ctx:AUDIT.requestUri:-}"/>
+              <KeyValuePair key="responseCode" value="$${ctx:AUDIT.responseCode:-}"/>
+              <KeyValuePair key="applicationName" value="$${ctx:AUDIT.applicationName:-}"/>
+              <KeyValuePair key="resourceName" value="$${ctx:AUDIT.resourceName:-}"/>
+              <KeyValuePair key="pathPrefix" value="$${ctx:AUDIT.pathPrefix:-}"/>
+              <KeyValuePair key="log_name" value="agent-audit"/>
           </JSONLayout>
         </Console>
 
