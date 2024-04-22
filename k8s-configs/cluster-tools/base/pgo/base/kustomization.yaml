@@ -34,7 +34,7 @@ patches:
         path: /metadata/annotations/argocd.argoproj.io~1sync-options
         value: "Replace=true"
 
-
+  # Update memory and cpu limits per P1AS needs
   - patch: |-
       apiVersion: apps/v1
       kind: Deployment
@@ -53,6 +53,7 @@ patches:
                   memory: "150Mi"
                   cpu: "30m"
 
+  # Update memory and cpu limits per P1AS needs
   - patch: |-
       apiVersion: apps/v1
       kind: Deployment
