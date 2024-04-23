@@ -33,12 +33,12 @@ BUCKET_URL_NO_PROTOCOL=${ARTIFACT_REPO_BUCKET#s3://}
 BUCKET_NAME=$(echo ${BUCKET_URL_NO_PROTOCOL} | cut -d/ -f1)
 ​
 # Check to see if the bucket exists
-# aws s3api head-bucket --bucket ${BUCKET_NAME}
-# if ! test $(echo $?) == "0"; then
-#   # Create the bucket
-#   aws s3api create-bucket --bucket ${BUCKET_NAME}
-#   check_for_error "Could not create bucket ${BUCKET_NAME}"
-# fi
+aws s3api head-bucket --bucket ${BUCKET_NAME}
+if ! test $(echo $?) == "0"; then
+  # Create the bucket
+  aws s3api create-bucket --bucket ${BUCKET_NAME}
+  check_for_error "Could not create bucket ${BUCKET_NAME}"
+fi
 ​
 # Add /pingfederate to base repo URL
 if [ -z "${ARTIFACT_REPO_BUCKET##*/pingfederate*}" ] ;then
@@ -61,7 +61,7 @@ echo " << ARTIFACT_EXTENSION: ${ARTIFACT_EXTENSION} >> "
 ARTIFACT_RUNTIME_ZIP=${ARTIFACT_NAME_WITH_VERSION}-runtime.zip
 echo " << ARTIFACT_RUNTIME_ZIP: ${ARTIFACT_RUNTIME_ZIP} >> "
 ​
-DOWNLOAD_DIR="/Users/vathsalyakidambi/Desktop/repos/vathsalya_test_2"
+DOWNLOAD_DIR=$(mktemp -d)
 ​
 # Cleanup artifact folder if it exists
 if [ -f "${DOWNLOAD_DIR}/${ARTIFACT_NAME_WITH_VERSION}" ]
