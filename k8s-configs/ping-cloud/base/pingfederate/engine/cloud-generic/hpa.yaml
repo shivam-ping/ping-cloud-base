@@ -10,3 +10,10 @@ spec:
     kind: StatefulSet
     name: pingfederate
   targetCPUUtilizationPercentage: 70
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 60
+      policies:
+        type: Pods
+        value: 1
+  periodSeconds: 5
