@@ -3,23 +3,3 @@
 # apiVersion: kustomize.config.k8s.io/v1beta1
 # resources:
 # - ${K8S_GIT_URL}/k8s-configs/cluster-tools/base/pgo/base?ref=${K8S_GIT_BRANCH}
-
-# patches:
-
-# ### PGO service account IRSA annotation ###
-# - patch: |-
-#     apiVersion: v1
-#     kind: ServiceAccount
-#     metadata:
-#       name: pgo
-#       annotations:
-#         ${IRSA_PGO_ANNOTATION_KEY_VALUE}
-
-# ### PGO upgrade service account IRSA annotation ###
-# - patch: |-
-#     apiVersion: v1
-#     kind: ServiceAccount
-#     metadata:
-#       name: postgres-operator-upgrade
-#       annotations:
-#         ${IRSA_PGO_ANNOTATION_KEY_VALUE}
