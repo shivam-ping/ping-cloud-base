@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.19.1.0
+
+_Changes:_
+
+- [X] PDO-7238 Remove KMS Init Container from PingDirectory
+
 ### 1.19.0.0
 
 - Create a new init container to upgrade PA and PA-WAS and mount volume to admin pod once upgrade is successful
