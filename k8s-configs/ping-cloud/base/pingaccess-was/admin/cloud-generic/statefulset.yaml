@@ -212,7 +212,7 @@ spec:
             optional: false
       containers:
       - name: pingaccess-was-admin
-        image: public.ecr.aws/r2h3l6e4/pingcloud-apps/pingaccess-was/dev:v2.0-release-branch-latest
+        image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/pingcloud-apps/pingaccess-was:pdo-5609-switch-to-heartbeat-endpoint
         imagePullPolicy: Always
         securityContext:
           runAsGroup: 9999

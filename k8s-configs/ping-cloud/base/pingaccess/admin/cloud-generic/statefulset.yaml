@@ -217,7 +217,7 @@ spec:
         # Add an infinite sleep after sso configuration so that pingaccess container continues to run
         args: [ "python3 -u /app/oauth_client_services_controller.py --app pingaccess && while true; do sleep 30; done" ]
       - name: pingaccess-admin
-        image: public.ecr.aws/r2h3l6e4/pingcloud-apps/pingaccess/dev:v2.0-release-branch-latest
+        image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/pingcloud-apps/pingaccess:pdo-5609-switch-to-heartbeat-endpoint
         imagePullPolicy: Always
         securityContext:
           runAsGroup: 9999
