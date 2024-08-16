@@ -1,6 +1,5 @@
 # This defines the pingaccess-was engine deployment.
 
-
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
