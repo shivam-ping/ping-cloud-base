@@ -124,7 +124,8 @@ spec:
         image: public.ecr.aws/r2h3l6e4/pingcloud-apps/pingaccess/dev:v2.1-release-branch-latest
         imagePullPolicy: Always
         command: ["/bin/sh"]
-        args: ["-c", " /opt/in/hooks/22-upgrade-server.sh  && cat /opt/in/hooks/logger.lib.sh"]
+        #args: ["-c", " /opt/in/hooks/22-upgrade-server.sh  && cat /opt/in/hooks/logger.lib.sh"]
+        args: ["-c", "cat /opt/in/hooks/logger.lib.sh"]
         securityContext:
           runAsGroup: 9999
           runAsNonRoot: true
