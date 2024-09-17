@@ -37,7 +37,9 @@ testBulkheadManagerWithAPI() {
   local script_path="/opt/staging/hooks/90-configure-bulkhead-manager.sh"
   local bulkhead_env_var="PF_BULKHEAD_THREAD_POOL_USAGE_WARNING_THRESHOLD=0.3"
   local api_endpoint="https://pingfederate-admin:9999/pf-admin-api/v1/configStore/com.pingidentity.common.util.resiliency.BulkheadManagerImpl"
+  #local api_endpoint="https://localhost:9999/pf-admin-api/v1/configStore/com.pingidentity.common.util.resiliency.BulkheadManagerImpl/Enabled"
   local curl_output
+  local PF_ADMIN_USER_PASSWORD="2FederateM0re"
 
   # Step 1: Export environment variable and execute the bulkhead manager script
   echo "Running bulkhead manager script with environment variable: ${bulkhead_env_var}"
@@ -49,20 +51,21 @@ testBulkheadManagerWithAPI() {
 
   # Step 2: Verify if the environment variables were applied by querying the API
   echo "Verifying that the environment variables were applied using the API"
-  curl_output=$(kubectl exec -it "${pod_name}" -n "${namespace}" -c "${container_name}" -- sh -c \
-    "curl -k --user \"Administrator:${PF_ADMIN_USER_PASSWORD}\" \
+  
+  #curl_output=$(kubectl exec -it "${pod_name}" -n "${namespace}" -c "${container_name}" -- sh -c \
+   curl_output=$(curl -k --user "Administrator:${PF_ADMIN_USER_PASSWORD}" \
     -X 'GET' \
     '${api_endpoint}' \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
-    -H 'X-XSRF-Header: PingFederate' | jq '.items'")
+    -H 'X-XSRF-Header: PingFederate')
 
   # Display the result and verify
   echo "API Response:"
   echo "${curl_output}"
 
   # Check if the threshold value we set is present in the API output
-  echo "${curl_output}" | grep "\"threadPoolUsageWarningThreshold\": \"0.3\"" >/dev/null 2>&1
+  echo "${curl_output}" | grep -q '"id":"ThreadPoolUsageWarningThreshold".*"stringValue":"0.3"'
   api_status=$?
 
   # Assert the API status
