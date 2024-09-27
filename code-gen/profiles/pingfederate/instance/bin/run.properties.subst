@@ -32,7 +32,7 @@ pf.admin.baseurl=https://${PF_ADMIN_PUBLIC_HOSTNAME}:443
 # network interfaces are installed on the machine running PingFederate.
 # The bind addresses can be ipv6 compliant: use "::" as a replacement
 # for "0.0.0.0".
-pf.console.bind.address=0.0.0.0
+# pf.console.bind.address=0.0.0.0
 
 #   HTML page title
 #   ---------------

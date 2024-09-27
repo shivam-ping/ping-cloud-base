@@ -204,6 +204,8 @@ spec:
             name: pingfederate-admin-environment-variables
         - configMapRef:
             name: pingcommon-environment-variables
+        - configMapRef:
+            name: pingfederate-run-properties-environment-variables
         - secretRef:
             name: newrelic-license-key
             optional: false
