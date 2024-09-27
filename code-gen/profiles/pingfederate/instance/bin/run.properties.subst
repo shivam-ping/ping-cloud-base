@@ -49,7 +49,7 @@ pf.console.environment=${PF_ADMIN_CONSOLE_ENVIRONMENT}
 #   HTML page background image
 #   ---------------
 # This property enables image background for administrative console
-pf.console.show.background.images=true
+# pf.console.show.background.images=true
 
 #   PingOne unified admin settings
 #   -----------------------
@@ -62,10 +62,10 @@ pf.console.show.background.images=true
 #     asia    - (Deprecated) Please use com.au instead. Indicates the Asia region at console.pingone.asia
 #     ca      - indicates the Canada region at console.pingone.ca
 #     com.au  - indicates the Australia region at console.pingone.com.au
-pf.pingone.admin.url.region=
+# pf.pingone.admin.url.region=
 
 # The ID of your PingOne organization's environment.
-pf.pingone.admin.url.environment.id=
+# pf.pingone.admin.url.environment.id=
 
 #   Admin Console UI Timeout
 #   ------------------------
@@ -74,7 +74,7 @@ pf.pingone.admin.url.environment.id=
 # administrative console times out. The minimum setting is 1 minute; maximum is 
 # 8 hours (480 minutes). 
 # Default is 30 minutes.
-pf.console.session.timeout=30
+# pf.console.session.timeout=30
 
 #   Login Mode
 #   ----------
@@ -85,7 +85,7 @@ pf.console.session.timeout=30
 #     single   - Only one Admin user may log on at a time.
 #     multiple - More than one Admin user may log on simultaneously.
 # Default is multiple.
-pf.console.login.mode=multiple
+# pf.console.login.mode=multiple
 
 #   Authentication Mechanism
 #   ------------------------
@@ -128,32 +128,32 @@ pf.console.authentication=${PF_CONSOLE_AUTHENTICATION}
 #      PingFederate will fail on startup.
 # Please find the documentation for details about using multiple authentication
 # sources.
-pf.admin.api.authentication=LDAP
+# pf.admin.api.authentication=LDAP
 
 #
 # When LDAP administrative-console authentication is enabled, this property 
 # indicates the name of the file containing configuration properties.
-ldap.properties.file=ldap.properties
+# ldap.properties.file=ldap.properties
 
 #
 # When certificate-based authentication is enabled, this property indicates the 
 # name of the file containing configuration properties.
-cert.properties.file=cert_auth.properties
+# cert.properties.file=cert_auth.properties
 
 #
 # When RADIUS-based authentication is enabled, this property indicates the 
 # name of the configuration properties file.
-radius.properties.file=radius.properties
+# radius.properties.file=radius.properties
 
 #
 # When OIDC administrative-console authentication is enabled, this property
 # indicates the name of the file containing configuration properties.
-oidc.properties.file=oidc.properties
+# oidc.properties.file=oidc.properties
 
 #
 # When OAuth 2.0 administrative-API authentication is enabled, this property
 # indicates the name of the file containing configuration properties.
-oauth2.properties.file=oauth2.properties
+# oauth2.properties.file=oauth2.properties
 
 
 # -------------------------
@@ -165,20 +165,20 @@ oauth2.properties.file=oauth2.properties
 # If you do want to turn on "pf.http.port" for testing purposes, you will 
 # need to update data/config-store/session-cookie-config.xml 
 # to turn off the secure cookie.
-pf.http.port=-1
+# pf.http.port=-1
 
 #
 # This property defines the port on which PingFederate listens for 
 # encrypted HTTPS (SSL/TLS) traffic. 
 # Default is 9031.
-pf.https.port=9031
+# pf.https.port=9031
 
 # This property defines a secondary HTTPS port that can be used for mutual SSL/TLS
 # (client X.509 certificate) authentication for both end users and protocol
 # requests (SAML, WS-Trust and OAuth). Set its value to the desired inbound
 # listening TCP port.
 # A value of -1 disables this feature.
-pf.secondary.https.port=-1
+# pf.secondary.https.port=-1
 
 #
 # This property defines the IP address over which the PingFederate server 
@@ -186,7 +186,7 @@ pf.secondary.https.port=-1
 # multiple network interfaces are installed on the machine running PingFederate.
 # The bind addresses can be ipv6 compliant: use "::" as a replacement
 # for "0.0.0.0".
-pf.engine.bind.address=0.0.0.0
+# pf.engine.bind.address=0.0.0.0
 
 #
 # This property defines the IP address over which JMX
@@ -194,7 +194,7 @@ pf.engine.bind.address=0.0.0.0
 # interfaces are installed on the machine running PingFederate.
 # The bind addresses can be ipv6 compliant: use "::" as a replacement
 # for "0.0.0.0".
-pf.monitor.bind.address=0.0.0.0
+# pf.monitor.bind.address=0.0.0.0
 
 #
 # This property defines the protocol to be used by PingFederate. 
@@ -202,7 +202,7 @@ pf.monitor.bind.address=0.0.0.0
 #   true  - Enables use of ipv_4 only. 
 #   false - Enables use of both ipv_4 and ipv_6.
 # Default is true.
-pf.engine.prefer_ipv4=true
+# pf.engine.prefer_ipv4=true
 
 # This property defines the context path used for the PingFederate
 # runtime application.
@@ -210,32 +210,32 @@ pf.engine.prefer_ipv4=true
 # the base URL for your PingFederate system protocol settings.
 # The default is "/", which is the root of the server.
 # Both, "/sso" and "/sso/" are valid values for this property.
-pf.runtime.context.path=/
+# pf.runtime.context.path=/
 
 #
 # This property defines the network path to the output location of log files. 
 # Default is: 
 #  <pf_install>/pingfederate/log
-#pf.log.dir=
+# pf.log.dir=
 
 #
 # This property enables detailed event logging where changes to the components are logged. 
 # Default is false
 #
 # Setting pf.log.eventdetail=true , which will log diffs of admin console and admin API changes 
-pf.log.eventdetail=true
+# pf.log.eventdetail=true
 
 #
 # This property enables detailed system monitoring information to be made available 
 # in the heartbeat endpoint 
 #
-pf.heartbeat.system.monitoring=true
+# pf.heartbeat.system.monitoring=true
 
 #
 # This property sets the maximum request body size for inbound runtime requests.
 # Default is 200000 if one is not specified. Units are in bytes.
 #
-pf.runtime.http.maxRequestBodySize=200000
+# pf.runtime.http.maxRequestBodySize=200000
 
 # ---------------------
 # Deployment Properties
