@@ -165,20 +165,20 @@ oauth2.properties.file=oauth2.properties
 # If you do want to turn on "pf.http.port" for testing purposes, you will 
 # need to update data/config-store/session-cookie-config.xml 
 # to turn off the secure cookie.
-# pf.http.port=-1
+pf.http.port=-1
 
 #
 # This property defines the port on which PingFederate listens for 
 # encrypted HTTPS (SSL/TLS) traffic. 
 # Default is 9031.
-# pf.https.port=9031
+pf.https.port=9031
 
 # This property defines a secondary HTTPS port that can be used for mutual SSL/TLS
 # (client X.509 certificate) authentication for both end users and protocol
 # requests (SAML, WS-Trust and OAuth). Set its value to the desired inbound
 # listening TCP port.
 # A value of -1 disables this feature.
-# pf.secondary.https.port=-1
+pf.secondary.https.port=-1
 
 #
 # This property defines the IP address over which the PingFederate server 
@@ -202,7 +202,7 @@ oauth2.properties.file=oauth2.properties
 #   true  - Enables use of ipv_4 only. 
 #   false - Enables use of both ipv_4 and ipv_6.
 # Default is true.
-pf.engine.prefer_ipv4=true
+# pf.engine.prefer_ipv4=true
 
 # This property defines the context path used for the PingFederate
 # runtime application.
@@ -210,7 +210,7 @@ pf.engine.prefer_ipv4=true
 # the base URL for your PingFederate system protocol settings.
 # The default is "/", which is the root of the server.
 # Both, "/sso" and "/sso/" are valid values for this property.
-pf.runtime.context.path=/
+# pf.runtime.context.path=/
 
 #
 # This property defines the network path to the output location of log files. 
@@ -223,19 +223,19 @@ pf.runtime.context.path=/
 # Default is false
 #
 # Setting pf.log.eventdetail=true , which will log diffs of admin console and admin API changes 
-pf.log.eventdetail=true
+# pf.log.eventdetail=true
 
 #
 # This property enables detailed system monitoring information to be made available 
 # in the heartbeat endpoint 
 #
-pf.heartbeat.system.monitoring=true
+# pf.heartbeat.system.monitoring=true
 
 #
 # This property sets the maximum request body size for inbound runtime requests.
 # Default is 200000 if one is not specified. Units are in bytes.
 #
-pf.runtime.http.maxRequestBodySize=200000
+# pf.runtime.http.maxRequestBodySize=200000
 
 # ---------------------
 # Deployment Properties
