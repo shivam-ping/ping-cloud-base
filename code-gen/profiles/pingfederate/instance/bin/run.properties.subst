@@ -165,20 +165,20 @@ oauth2.properties.file=oauth2.properties
 # If you do want to turn on "pf.http.port" for testing purposes, you will 
 # need to update data/config-store/session-cookie-config.xml 
 # to turn off the secure cookie.
-# pf.http.port=-1
+pf.http.port=-1
 
 #
 # This property defines the port on which PingFederate listens for 
 # encrypted HTTPS (SSL/TLS) traffic. 
 # Default is 9031.
-# pf.https.port=9031
+pf.https.port=9031
 
 # This property defines a secondary HTTPS port that can be used for mutual SSL/TLS
 # (client X.509 certificate) authentication for both end users and protocol
 # requests (SAML, WS-Trust and OAuth). Set its value to the desired inbound
 # listening TCP port.
 # A value of -1 disables this feature.
-# pf.secondary.https.port=-1
+pf.secondary.https.port=-1
 
 #
 # This property defines the IP address over which the PingFederate server 
@@ -186,7 +186,7 @@ oauth2.properties.file=oauth2.properties
 # multiple network interfaces are installed on the machine running PingFederate.
 # The bind addresses can be ipv6 compliant: use "::" as a replacement
 # for "0.0.0.0".
-# pf.engine.bind.address=0.0.0.0
+pf.engine.bind.address=0.0.0.0
 
 #
 # This property defines the IP address over which JMX
@@ -194,7 +194,7 @@ oauth2.properties.file=oauth2.properties
 # interfaces are installed on the machine running PingFederate.
 # The bind addresses can be ipv6 compliant: use "::" as a replacement
 # for "0.0.0.0".
-# pf.monitor.bind.address=0.0.0.0
+pf.monitor.bind.address=0.0.0.0
 
 #
 # This property defines the protocol to be used by PingFederate. 
@@ -259,13 +259,13 @@ pf.operational.mode=$OPERATIONAL_MODE
 
 # The following properties apply only if "pf.operational.mode"
 # is *not* STANDALONE:
-pf.cluster.node.index=
+# pf.cluster.node.index=
 # A strong, randomly-generated key (22 or more alphanumerics) is recommended.
 # In BCFIPS mode, if encryption is enabled, the minimum length of 22
 # characters is enforced.
 # Keep 'pf.cluster.auth.pwd' empty as it will be replaced by P1AS automation by injecting the obfuscated variable of PF_CLUSTER_AUTH_PASSWORD
-pf.cluster.auth.pwd=
-pf.cluster.encrypt=false
+# pf.cluster.auth.pwd=
+# pf.cluster.encrypt=false
 
 # Specify the key size to use with the AES encryption algorithm that is used
 # when encrypting communication among the cluster. The key sizes allowed
@@ -273,21 +273,21 @@ pf.cluster.encrypt=false
 # example, Oracle's Java Cryptography Extension (JCE) Unlimited Strength
 # provider supports 128, 192, and 256 bit key sizes.
 # Default is 128.
-pf.cluster.encryption.keysize=128
+# pf.cluster.encryption.keysize=128
 
 # Specify the IP address for cluster communication, or leave as NON_LOOPBACK to
 # allow the system to choose an available non-loopback IP address.
-pf.cluster.bind.address=NON_LOOPBACK
-pf.cluster.bind.port=7600
-pf.cluster.failure.detection.bind.port=7700
+# pf.cluster.bind.address=NON_LOOPBACK
+# pf.cluster.bind.port=7600
+# pf.cluster.failure.detection.bind.port=7700
 
 # Allowed values for the following properties are: tcp/udp. Default is tcp.
 # IMPORTANT: For UDP clustering with PingFederate running on Windows using ipv6. 
 # You must supply the interface identifier (for example: %11) in the 
 # "pf.cluster.bind.address" above.
-pf.cluster.transport.protocol=tcp
-pf.cluster.mcast.group.address=239.16.96.69
-pf.cluster.mcast.group.port=7601
+# pf.cluster.transport.protocol=tcp
+# pf.cluster.mcast.group.address=239.16.96.69
+# pf.cluster.mcast.group.port=7601
 
 # When TCP is used, this property specifies the list of hosts in the cluster.
 # For example: "10.0.1.4[7600],server2.mydomain.com[7600]".
@@ -300,7 +300,7 @@ pf.cluster.mcast.group.port=7601
 # discovery mechanisms are available. See bin/jgroups.properties for
 # further details. If a dynamic discovery mechanism is used, this property
 # is ignored.
-pf.cluster.tcp.discovery.initial.hosts=
+# pf.cluster.tcp.discovery.initial.hosts=
 
 # This property enables/disables adaptive clustering. Please see the
 # PingFederate clustering guide for more information on this capability.
@@ -308,19 +308,19 @@ pf.cluster.tcp.discovery.initial.hosts=
 #   true - enable adaptive clustering
 #   false - disable adaptive clustering
 # Default is true. 
-pf.cluster.adaptive=true
+# pf.cluster.adaptive=true
 
 # This property enables/disables JGroups cluster diagnostics.
 #  Valid values are: 
 #	true - enable diagnostics
 #	false - disable diagnostics
 # Default is false
-pf.cluster.diagnostics.enabled=false
+# pf.cluster.diagnostics.enabled=false
 
 # These properties define the IP address and port over which PingFederate communicates
 # JGroups diagnostic information.
-pf.cluster.diagnostics.addr=224.0.75.75
-pf.cluster.diagnostics.port=7500
+# pf.cluster.diagnostics.addr=224.0.75.75
+# pf.cluster.diagnostics.port=7500
 
 # This property defines the tags associated with this PingFederate node.
 # Configuration is optional. When configured, PingFederate takes this property
@@ -340,7 +340,7 @@ pf.cluster.diagnostics.port=7500
 #
 # Example 3: node.tags=
 # Example 3 is also valid because the node.tags property is optional.
-node.tags=
+# node.tags=
 
 #   Hardware Security Module Mode
 #   -----------------------------
@@ -353,7 +353,7 @@ node.tags=
 #    BCFIPS      - Denotes a Bouncy Castle FIPS implementation.
 #    OFF         - Use the default Sun keystore/JCE implementation.
 # Default is OFF.
-pf.hsm.mode=OFF
+# pf.hsm.mode=OFF
 
 #  Hardware Security Module Hybrid Mode
 #  ------------------------------------
@@ -366,14 +366,14 @@ pf.hsm.mode=OFF
 #    true - enable Hybrid mode.
 #    false - disable Hybrid mode.
 # Default is false.
-pf.hsm.hybrid=false
+# pf.hsm.hybrid=false
 
 # Additional allowed security providers for BCFIPS mode.
 #
 # When operating in BCFIPS mode, PingFederate limits the provider list to the
 # minimum required. Additional providers can be allowed by adding their class names
 # to the following comma-delimited list.
-pf.fips.additional.allowed.providers=
+# pf.fips.additional.allowed.providers=
 
 #   Outbound Provisioner Properties
 #   ---------------------------
