@@ -128,32 +128,32 @@ pf.console.authentication=${PF_CONSOLE_AUTHENTICATION}
 #      PingFederate will fail on startup.
 # Please find the documentation for details about using multiple authentication
 # sources.
-# pf.admin.api.authentication=LDAP
+pf.admin.api.authentication=LDAP
 
 #
 # When LDAP administrative-console authentication is enabled, this property 
 # indicates the name of the file containing configuration properties.
-# ldap.properties.file=ldap.properties
+ldap.properties.file=ldap.properties
 
 #
 # When certificate-based authentication is enabled, this property indicates the 
 # name of the file containing configuration properties.
-# cert.properties.file=cert_auth.properties
+cert.properties.file=cert_auth.properties
 
 #
 # When RADIUS-based authentication is enabled, this property indicates the 
 # name of the configuration properties file.
-# radius.properties.file=radius.properties
+radius.properties.file=radius.properties
 
 #
 # When OIDC administrative-console authentication is enabled, this property
 # indicates the name of the file containing configuration properties.
-# oidc.properties.file=oidc.properties
+oidc.properties.file=oidc.properties
 
 #
 # When OAuth 2.0 administrative-API authentication is enabled, this property
 # indicates the name of the file containing configuration properties.
-# oauth2.properties.file=oauth2.properties
+oauth2.properties.file=oauth2.properties
 
 
 # -------------------------
