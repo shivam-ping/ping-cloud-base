@@ -128,32 +128,32 @@ pf.console.authentication=${PF_CONSOLE_AUTHENTICATION}
 #      PingFederate will fail on startup.
 # Please find the documentation for details about using multiple authentication
 # sources.
-# pf.admin.api.authentication=LDAP
+pf.admin.api.authentication=LDAP
 
 #
 # When LDAP administrative-console authentication is enabled, this property 
 # indicates the name of the file containing configuration properties.
-# ldap.properties.file=ldap.properties
+ldap.properties.file=ldap.properties
 
 #
 # When certificate-based authentication is enabled, this property indicates the 
 # name of the file containing configuration properties.
-# cert.properties.file=cert_auth.properties
+cert.properties.file=cert_auth.properties
 
 #
 # When RADIUS-based authentication is enabled, this property indicates the 
 # name of the configuration properties file.
-# radius.properties.file=radius.properties
+radius.properties.file=radius.properties
 
 #
 # When OIDC administrative-console authentication is enabled, this property
 # indicates the name of the file containing configuration properties.
-# oidc.properties.file=oidc.properties
+oidc.properties.file=oidc.properties
 
 #
 # When OAuth 2.0 administrative-API authentication is enabled, this property
 # indicates the name of the file containing configuration properties.
-# oauth2.properties.file=oauth2.properties
+oauth2.properties.file=oauth2.properties
 
 
 # -------------------------
@@ -165,20 +165,20 @@ pf.console.authentication=${PF_CONSOLE_AUTHENTICATION}
 # If you do want to turn on "pf.http.port" for testing purposes, you will 
 # need to update data/config-store/session-cookie-config.xml 
 # to turn off the secure cookie.
-pf.http.port=-1
+# pf.http.port=-1
 
 #
 # This property defines the port on which PingFederate listens for 
 # encrypted HTTPS (SSL/TLS) traffic. 
 # Default is 9031.
-pf.https.port=9031
+# pf.https.port=9031
 
 # This property defines a secondary HTTPS port that can be used for mutual SSL/TLS
 # (client X.509 certificate) authentication for both end users and protocol
 # requests (SAML, WS-Trust and OAuth). Set its value to the desired inbound
 # listening TCP port.
 # A value of -1 disables this feature.
-pf.secondary.https.port=-1
+# pf.secondary.https.port=-1
 
 #
 # This property defines the IP address over which the PingFederate server 
@@ -186,7 +186,7 @@ pf.secondary.https.port=-1
 # multiple network interfaces are installed on the machine running PingFederate.
 # The bind addresses can be ipv6 compliant: use "::" as a replacement
 # for "0.0.0.0".
-pf.engine.bind.address=0.0.0.0
+# pf.engine.bind.address=0.0.0.0
 
 #
 # This property defines the IP address over which JMX
@@ -194,7 +194,7 @@ pf.engine.bind.address=0.0.0.0
 # interfaces are installed on the machine running PingFederate.
 # The bind addresses can be ipv6 compliant: use "::" as a replacement
 # for "0.0.0.0".
-pf.monitor.bind.address=0.0.0.0
+# pf.monitor.bind.address=0.0.0.0
 
 #
 # This property defines the protocol to be used by PingFederate. 
