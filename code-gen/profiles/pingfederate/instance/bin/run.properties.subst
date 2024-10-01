@@ -479,8 +479,8 @@ org.apache.xml.security.ignoreLineBreaks=true
 # These properties determine the default timeouts for outbound java.net.URL connections (in milliseconds).
 # These values may be overridden in certain contexts.
 # When a more specific configuration option is not available, these defaults are used.
-sun.net.client.defaultConnectTimeout=30000
-sun.net.client.defaultReadTimeout=30000
+# sun.net.client.defaultConnectTimeout=30000
+# sun.net.client.defaultReadTimeout=30000
 
 #   TLS Protocol Settings
 #   ---------------------
@@ -492,9 +492,9 @@ sun.net.client.defaultReadTimeout=30000
 # "pf.admin.tls.server.protocols" property is used by PingFederate for all administrative console inbound HTTPS connections
 #
 # The default value of "TLSv1.2" will be used if any of these properties are not present
-pf.tls.client.protocols=TLSv1.2,TLSv1.3
-pf.tls.runtime.server.protocols=TLSv1.2,TLSv1.3
-pf.tls.admin.server.protocols=TLSv1.2,TLSv1.3
+# pf.tls.client.protocols=TLSv1.2,TLSv1.3
+# pf.tls.runtime.server.protocols=TLSv1.2,TLSv1.3
+# pf.tls.admin.server.protocols=TLSv1.2,TLSv1.3
 
 #   HTTP Server Thread Pool Settings
 #   --------------------------------
@@ -511,9 +511,9 @@ pf.runtime.threads.max=${PF_JETTY_THREADS_MAX}
 # The following properties control the queue size of the HTTP connector.
 #
 # Please refer to the performance tuning guide for further tuning guidance.
-pf.admin.acceptQueueSize=512
-pf.runtime.acceptQueueSize=512
+# pf.admin.acceptQueueSize=512
+# pf.runtime.acceptQueueSize=512
 
 #   Log4j 2 Settings
 #   ---------------------------
-log4j2.formatMsgNoLookups=true
+# log4j2.formatMsgNoLookups=true
