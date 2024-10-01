@@ -432,13 +432,13 @@ jetty51.encode.cookies=
 
 # A comma separated list of cookie names whose values should *not* be wrapped
 # in quotes when special characters are detected.   
-cookies.skip.quoting=_saml_idp
+# cookies.skip.quoting=_saml_idp
 
 #   SSL Session Cache
 #   -----------------
 # Sets the size of the SSL session cache used for storing SSLSession objects.  
 # 0 means there is no limit.  
-javax.net.ssl.sessionCacheSize=5000
+# javax.net.ssl.sessionCacheSize=5000
 
 #   HTTP Forward Proxy Settings
 #   ---------------------------
@@ -465,16 +465,16 @@ javax.net.ssl.sessionCacheSize=5000
 # not recommended because the proxy credentials are transmitted to the server without
 # encryption. However, if you still want to enable basic authentication for an HTTP target site,
 # you can remove 'Basic' from the following line.
-jdk.http.auth.proxying.disabledSchemes=Basic
+# jdk.http.auth.proxying.disabledSchemes=Basic
 
 # Basic authentication is not recommended because the proxy credentials are transmitted to the
 # server without encryption. However, if you still want to enable basic authentication for an
 # HTTPS target site, you can remove 'Basic' from the following line.
-jdk.http.auth.tunneling.disabledSchemes=Basic
+# jdk.http.auth.tunneling.disabledSchemes=Basic
 
 # This property determines whether PingFederate omits line breaks in XML digital signatures. If omitted, this setting defaults to "false".
 # It is recommended to set this as "true" for improved interoperability with Microsoft products.
-org.apache.xml.security.ignoreLineBreaks=true
+# org.apache.xml.security.ignoreLineBreaks=true
 
 # These properties determine the default timeouts for outbound java.net.URL connections (in milliseconds).
 # These values may be overridden in certain contexts.
