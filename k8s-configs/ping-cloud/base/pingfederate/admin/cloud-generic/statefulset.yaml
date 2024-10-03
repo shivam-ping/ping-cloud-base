@@ -147,10 +147,6 @@ spec:
       containers:
       - name: pingfederate-admin
         image: public.ecr.aws/r2h3l6e4/pingcloud-apps/pingfederate/dev:v2.0-release-branch-latest
-        args:
-        - |
-          export PF_RUN_PF_ADMIN_BASEURL="https://${PF_ADMIN_PUBLIC_HOSTNAME}:443";  # Set PF_RUN_PF_ADMIN_BASEURL based on PF_ADMIN_PUBLIC_HOSTNAME from the image
-        securityContext:
           runAsGroup: 9999
           runAsNonRoot: true
           runAsUser: 9031
