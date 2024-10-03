@@ -147,6 +147,34 @@ spec:
       containers:
       - name: pingfederate-admin
         image: public.ecr.aws/r2h3l6e4/pingcloud-apps/pingfederate/dev:v2.0-release-branch-latest
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            # Dynamic variables for run.properties
+            export PF_RUN_PF_ADMIN_HTTPS_PORT=${PF_ADMIN_PORT}
+            export PF_RUN_PF_ADMIN_BASEURL="https://${PF_ADMIN_PUBLIC_HOSTNAME}:443"
+            export PF_RUN_PF_CONSOLE_TITLE="${PF_ADMIN_CONSOLE_TITLE}"
+            export PF_RUN_PF_CONSOLE_ENVIRONMENT="${PF_ADMIN_CONSOLE_ENVIRONMENT}"  
+            export PF_RUN_PF_CONSOLE_AUTHENTICATION=LDAP
+            # export PF_RUN_PF_CONSOLE_AUTHENTICATION="${PF_CONSOLE_AUTHENTICATION}"
+            export PF_RUN_PF_OPERATIONAL_MODE=CLUSTERED_CONSOLE
+            export PF_RUN_PF_PROVISIONER_MODE=${PF_PROVISIONER_MODE}
+            export PF_RUN_PF_PROVISIONER_NODE_ID=${PF_PROVISIONER_NODE_ID}
+            export PF_RUN_PF_PROVISIONER_FAILOVER_GRACE_PERIOD=${PF_PROVISIONER_GRACE_PERIOD}
+            export PF_RUN_PF_ADMIN_THREADS_MIN=
+            export PF_RUN_PF_ADMIN_THREADS_MAX=
+            export PF_RUN_PF_RUNTIME_THREADS_MIN=
+            export PF_RUN_PF_RUNTIME_THREADS_MAX=
+            
+            
+            echo "Testing dynamic variables"
+            printenv | grep PF_RUN
+            
+            # Execute PDI Team Entrypoint Script located in DockerFile
+            # https://github.com/pingidentity/pingidentity-docker-builds/blob/master/pingfederate/Dockerfile
+            /opt/bootstrap.sh "start-server"
+
         securityContext:
           runAsGroup: 9999
           runAsNonRoot: true
@@ -204,6 +232,8 @@ spec:
             name: pingfederate-admin-environment-variables
         - configMapRef:
             name: pingcommon-environment-variables
+        - configMapRef:
+            name: pingfederate-run-properties-environment-variables
         - secretRef:
             name: newrelic-license-key
             optional: false
