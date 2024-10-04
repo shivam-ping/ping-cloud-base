@@ -125,21 +125,31 @@ relative_path() {
 #   $1 -> The directory containing k8s-configs.
 ########################################################################################################################
 feature_flags() {
-  cd "${1}/k8s-configs"
-
   # Map with the feature flag environment variable & the term to search to find the kustomization files
   flag_map="${RADIUS_PROXY_ENABLED}:ff-radius-proxy
             ${CUSTOMER_PINGONE_ENABLED}:customer-p1-connection.yaml
             ${KARPENTER_ENABLED}:karpenter-feature"
 
   for flag in $flag_map; do
-    enabled="${flag%%:*}"
+    enabled="${flag%%:*}"                  
     search_term="${flag##*:}"
+
     log "${search_term} is set to ${enabled}"
+
+    # Determine the appropriate directory and search command based on the search term
+    if [[ ${search_term} == "karpenter-feature" ]]; then
+      search_dir="${TMP_DIR}"
+      search_command='grep --exclude-dir=.git -rwl'
+    else
+      search_dir="${1}/k8s-configs"
+      search_command='git grep -l'
+    fi
+
+    cd "${search_dir}" || exit
 
     # When feature flag is enabled, uncomment the search term to include the resources in the kustomization files
     # When feature flag is disabled, comment the search term to exclude the resources in the kustomization files
-    for kust_file in $(git grep -l "${search_term}" | grep "kustomization.yaml"); do
+    for kust_file in $(${search_command} "${search_term}" | grep "kustomization.yaml"); do
       if [[ $(lowercase "${enabled}") == "true" ]]; then
         uncomment_lines_in_file "${kust_file}" "${search_term}"
       else
