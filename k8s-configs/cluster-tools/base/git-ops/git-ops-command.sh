@@ -129,7 +129,8 @@ feature_flags() {
 
   # Map with the feature flag environment variable & the term to search to find the kustomization files
   flag_map="${RADIUS_PROXY_ENABLED}:ff-radius-proxy
-            ${CUSTOMER_PINGONE_ENABLED}:customer-p1-connection.yaml"
+            ${CUSTOMER_PINGONE_ENABLED}:customer-p1-connection.yaml
+            ${KARPENTER_ENABLED}:karpenter-feature"
 
   for flag in $flag_map; do
     enabled="${flag%%:*}"
@@ -161,6 +162,20 @@ enable_external_ingress() {
       comment_lines_in_file "${kust_file}" "${search_term}"
     done
   done
+}
+
+########################################################################################################################
+# Comments/Uncomment karpenter on base of flag
+#
+# Arguments
+#   $1 -> The directory containing kustomize file.
+########################################################################################################################
+toggleKarpenter(){
+  if [[ $(lowercase "${KARPENTER_ENABLED}") == "true" ]]; then
+        uncomment_lines_in_file "$1/base/cluster-tools/kustomization.yaml" "karpenter"
+      else
+        comment_lines_in_file "$1/base/cluster-tools/kustomization.yaml" "karpenter"
+      fi
 }
 
 ########################################################################################################################
@@ -330,6 +345,7 @@ if test -f 'env_vars'; then
 
     feature_flags "${TMP_DIR}/${K8S_GIT_BRANCH}"
     enable_external_ingress
+    #toggleKarpenter "${TMP_DIR}"
   )
   test $? -ne 0 && exit 1
 fi
