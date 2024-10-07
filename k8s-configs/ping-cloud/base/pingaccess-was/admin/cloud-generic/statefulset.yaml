@@ -163,7 +163,7 @@ spec:
           mountPath: /usr/local/bin/kubectl
           subPath: kubectl
         - name: data-dir
-          mountPath: /opt/staging/hooks/logger.lib.sh
+          mountPath: /opt/in/hooks/logger.lib.sh
           subPath: logger.lib.sh
         - name: data-dir
           mountPath: /opt/staging/jmx_prometheus_javaagent-0.14.0.jar
