@@ -136,7 +136,7 @@ spec:
             name: pingfederate-environment-variables
       containers:
       - name: pingfederate
-        image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/pingcloud-apps/pingfederate:pdo-8134-test
+        image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/pingcloud-apps/pingfederate:pdo-8134-run-prop-calvin
         securityContext:
           runAsGroup: 9999
           runAsNonRoot: true
