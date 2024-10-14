@@ -152,7 +152,7 @@ spec:
           - "-c"
           - |
             # Dynamic variables for run.properties
-            export PF_RUN_PF_ADMIN_HTTPS_PORT=${PF_ADMIN_PORT}
+            export PF_RUN_pf_admin_https_port=${PF_ADMIN_PORT}
             export PF_RUN_PF_ADMIN_BASEURL="https://${PF_ADMIN_PUBLIC_HOSTNAME}:443"
             export PF_RUN_PF_CONSOLE_TITLE="${PF_ADMIN_CONSOLE_TITLE}"
             export PF_RUN_PF_CONSOLE_ENVIRONMENT="${PF_ADMIN_CONSOLE_ENVIRONMENT}"  
