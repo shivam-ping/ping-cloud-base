@@ -158,7 +158,7 @@ spec:
             export PF_RUN_PF_CONSOLE_ENVIRONMENT="${PF_ADMIN_CONSOLE_ENVIRONMENT}"  
             export PF_RUN_PF_CONSOLE_AUTHENTICATION=LDAP
             # export PF_RUN_PF_CONSOLE_AUTHENTICATION="${PF_CONSOLE_AUTHENTICATION}"
-            export PF_RUN_PF_OPERATIONAL_MODE=CLUSTERED_CONSOLE
+            export PF_RUN_pf_operational_mode=CLUSTERED_CONSOLE
             export PF_RUN_PF_PROVISIONER_MODE=${PF_PROVISIONER_MODE}
             export PF_RUN_PF_PROVISIONER_NODE_ID=${PF_PROVISIONER_NODE_ID}
             export PF_RUN_PF_PROVISIONER_FAILOVER_GRACE_PERIOD=${PF_PROVISIONER_GRACE_PERIOD}
@@ -182,6 +182,8 @@ spec:
           allowPrivilegeEscalation: false
         imagePullPolicy: Always
         env:
+        - name: PF_RUN_pf_operational_mode
+          value: CLUSTERED_CONSOLE
         - name: OPERATIONAL_MODE
           value: CLUSTERED_CONSOLE
         - name: PF_DNS_PING_NAMESPACE

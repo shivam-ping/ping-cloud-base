@@ -144,6 +144,8 @@ spec:
           allowPrivilegeEscalation: false
         imagePullPolicy: Always
         env:
+        - name: PF_RUN_pf_operational_mode
+          value: CLUSTERED_ENGINE
         - name: OPERATIONAL_MODE
           value: CLUSTERED_ENGINE
         - name: AUTHENTICATION_MODE
