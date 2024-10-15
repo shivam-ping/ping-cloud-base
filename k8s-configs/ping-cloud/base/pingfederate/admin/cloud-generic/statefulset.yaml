@@ -153,19 +153,19 @@ spec:
           - |
             # Dynamic variables for run.properties
             export PF_RUN_pf_admin_https_port=${PF_ADMIN_PORT}
-            export PF_RUN_PF_ADMIN_BASEURL="https://${PF_ADMIN_PUBLIC_HOSTNAME}:443"
-            export PF_RUN_PF_CONSOLE_TITLE="${PF_ADMIN_CONSOLE_TITLE}"
-            export PF_RUN_PF_CONSOLE_ENVIRONMENT="${PF_ADMIN_CONSOLE_ENVIRONMENT}"  
-            export PF_RUN_PF_CONSOLE_AUTHENTICATION=LDAP
+            export PF_RUN_pf_admin_baseurl="https://${PF_ADMIN_PUBLIC_HOSTNAME}:443"
+            export PF_RUN_pf_console_title="${PF_ADMIN_CONSOLE_TITLE}"
+            export PF_RUN_pf_console_environment="${PF_ADMIN_CONSOLE_ENVIRONMENT}"  
+            export PF_RUN_pf_console_authentication=LDAP
             # export PF_RUN_PF_CONSOLE_AUTHENTICATION="${PF_CONSOLE_AUTHENTICATION}"
             export PF_RUN_pf_operational_mode=CLUSTERED_CONSOLE
-            export PF_RUN_PF_PROVISIONER_MODE=${PF_PROVISIONER_MODE}
-            export PF_RUN_PF_PROVISIONER_NODE_ID=${PF_PROVISIONER_NODE_ID}
-            export PF_RUN_PF_PROVISIONER_FAILOVER_GRACE_PERIOD=${PF_PROVISIONER_GRACE_PERIOD}
-            export PF_RUN_PF_ADMIN_THREADS_MIN=
-            export PF_RUN_PF_ADMIN_THREADS_MAX=
-            export PF_RUN_PF_RUNTIME_THREADS_MIN=
-            export PF_RUN_PF_RUNTIME_THREADS_MAX=
+            export PF_RUN_pf_provisioner_mode=${PF_PROVISIONER_MODE}
+            export PF_RUN_pf_provisioner_mode_id=${PF_PROVISIONER_NODE_ID}
+            export PF_RUN_pf_provisioner_failover_grace_period=${PF_PROVISIONER_GRACE_PERIOD}
+            export PF_RUN_pf_admin_threads_min=
+            export PF_RUN_pf_admin_threads_max=
+            export PF_RUN_pf_runtime_threads_min=
+            export PF_RUN_pf_runtime_threads_max=
             
             
             echo "Testing dynamic variables"
