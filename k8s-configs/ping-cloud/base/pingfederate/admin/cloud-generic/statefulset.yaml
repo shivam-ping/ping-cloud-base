@@ -162,10 +162,10 @@ spec:
             export PF_RUN_pf_provisioner_mode=${PF_PROVISIONER_MODE}
             export PF_RUN_pf_provisioner_mode_id=${PF_PROVISIONER_NODE_ID}
             export PF_RUN_pf_provisioner_failover_grace_period=${PF_PROVISIONER_GRACE_PERIOD}
-            export PF_RUN_pf_admin_threads_min=200
-            export PF_RUN_pf_admin_threads_max=800
-            export PF_RUN_pf_runtime_threads_min=200
-            export PF_RUN_pf_runtime_threads_max=800
+            # export PF_RUN_pf_admin_threads_min=200
+            # export PF_RUN_pf_admin_threads_max=800
+            # export PF_RUN_pf_runtime_threads_min=200
+            # export PF_RUN_pf_runtime_threads_max=800
             
             
             echo "Testing dynamic variables"
