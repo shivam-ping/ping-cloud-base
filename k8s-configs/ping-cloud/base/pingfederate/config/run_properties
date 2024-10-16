@@ -1,3 +1,15 @@
+# In this run.properties we are not using the following variables due to: 
+
+# PDO-8135
+# PF_CONSOLE_TITLE
+# PF_CONSOLE_AUTHENTICATION
+# PF_CONSOLE_ENVIRONMENT
+
+# PDO-3791
+# PF_PROVISIONER_MODE
+# PF_PROVISIONER_NODE_ID
+# PF_PROVISIONER_GRACE_PERIOD
+
 PF_RUN_pf_console_bind_address=0.0.0.0
 PF_RUN_pf_console_show_background_images=true
 PF_RUN_pf_pingone_admin_url_region=

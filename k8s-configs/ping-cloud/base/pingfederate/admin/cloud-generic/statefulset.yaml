@@ -147,34 +147,6 @@ spec:
       containers:
       - name: pingfederate-admin
         image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/pingcloud-apps/pingfederate:pdo-8134-run-prop-calvin
-        command:
-          - "/bin/sh"
-          - "-c"
-          - |
-            # Dynamic variables for run.properties
-            export PF_RUN_pf_admin_https_port=${PF_ADMIN_PORT}
-            export PF_RUN_pf_admin_baseurl="https://${PF_ADMIN_PUBLIC_HOSTNAME}:443"
-            export PF_RUN_pf_console_title="${PF_ADMIN_CONSOLE_TITLE}"
-            export PF_RUN_pf_console_environment="${PF_ADMIN_CONSOLE_ENVIRONMENT}"  
-            export PF_RUN_pf_console_authentication=LDAP
-            # export PF_RUN_PF_CONSOLE_AUTHENTICATION="${PF_CONSOLE_AUTHENTICATION}"
-            export PF_RUN_pf_operational_mode=CLUSTERED_CONSOLE
-            export PF_RUN_pf_provisioner_mode=${PF_PROVISIONER_MODE}
-            export PF_RUN_pf_provisioner_mode_id=${PF_PROVISIONER_NODE_ID}
-            export PF_RUN_pf_provisioner_failover_grace_period=${PF_PROVISIONER_GRACE_PERIOD}
-            # export PF_RUN_pf_admin_threads_min=200
-            # export PF_RUN_pf_admin_threads_max=800
-            # export PF_RUN_pf_runtime_threads_min=200
-            # export PF_RUN_pf_runtime_threads_max=800
-            
-            
-            echo "Testing dynamic variables"
-            printenv | grep PF_RUN
-            
-            # Execute PDI Team Entrypoint Script located in DockerFile
-            # https://github.com/pingidentity/pingidentity-docker-builds/blob/master/pingfederate/Dockerfile
-            /opt/bootstrap.sh "start-server"
-
         securityContext:
           runAsGroup: 9999
           runAsNonRoot: true
@@ -182,8 +154,6 @@ spec:
           allowPrivilegeEscalation: false
         imagePullPolicy: Always
         env:
-        - name: PF_RUN_pf_operational_mode
-          value: CLUSTERED_CONSOLE
         - name: OPERATIONAL_MODE
           value: CLUSTERED_CONSOLE
         - name: PF_DNS_PING_NAMESPACE
