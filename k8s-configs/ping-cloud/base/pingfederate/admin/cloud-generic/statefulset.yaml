@@ -166,6 +166,8 @@ spec:
           allowPrivilegeEscalation: false
         imagePullPolicy: Always
         env:
+        - name: PF_RUN_pf_operational_mode
+          value: CLUSTERED_CONSOLE
         - name: OPERATIONAL_MODE
           value: CLUSTERED_CONSOLE
         - name: PF_DNS_PING_NAMESPACE
