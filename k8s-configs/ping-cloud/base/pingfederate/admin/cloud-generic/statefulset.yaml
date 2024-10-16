@@ -147,6 +147,18 @@ spec:
       containers:
       - name: pingfederate-admin
         image: 705370621539.dkr.ecr.us-west-2.amazonaws.com/pingcloud-apps/pingfederate:pdo-8134-run-prop-calvin
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+
+            echo "Testing dynamic variables"
+            printenv | grep PF_RUN
+            
+            # Execute PDI Team Entrypoint Script located in DockerFile
+            # https://github.com/pingidentity/pingidentity-docker-builds/blob/master/pingfederate/Dockerfile
+            /opt/bootstrap.sh "start-server"
+
         securityContext:
           runAsGroup: 9999
           runAsNonRoot: true
