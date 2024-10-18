@@ -154,6 +154,8 @@ spec:
           allowPrivilegeEscalation: false
         imagePullPolicy: Always
         env:
+        - name: RUN_CONF
+          value: /opt/staging/hooks/dynamic_system_variables/set-run-properties.sh
         - name: OPERATIONAL_MODE
           value: CLUSTERED_CONSOLE
         - name: PF_DNS_PING_NAMESPACE
