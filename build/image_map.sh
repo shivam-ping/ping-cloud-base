@@ -11,7 +11,6 @@
 export IMAGE_MAP="pingcloud-apps/pingaccess
    pingcloud-apps/pingaccess-was
    pingcloud-apps/pingfederate
-   pingcloud-apps/pingdirectory
    pingcloud-apps/pingdelegator
    pingcloud-apps/pingcentral
    pingcloud-apps/pingdatasync
@@ -32,4 +31,6 @@ export IMAGE_MAP="pingcloud-apps/pingaccess
    pingcloud-services/grp-radiusproxy
    pingcloud-services/ingress-bootstrap"
 
-export CHART_MAP="p1as-beluga-tools"
+export CHART_MAP="p1as-beluga-tools
+   p1as-pingdirectory
+   p1as-self-service"

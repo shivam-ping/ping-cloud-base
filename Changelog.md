@@ -14,10 +14,9 @@
 - Refactor update-profile-wrapper code to support new variables for microservice profile mirrors.
 - De-duplicate prod-values.yaml
 - To reorganize fluentbit configuration
+- Fluentbit revisit CICD integration test
 - Grafana fix PGO dashboard
 - Making Graviton as default for NON-GA environment, fix GA consistency across envs
-- Updating memory limits for thanos-storegateway
-- Updating memory limits plus other enhancements for thanos-compactor
 - Adding Cross zone load balancing and graceful shutdown to nginx
 - Upgrade External DNS to v0.14.2
 - Disabling anonymous login for OpenSearch and removing prometheus_read role
@@ -25,14 +24,20 @@
 - Enable runtime bulkhead via API for PingFederate
 - Upgrade Cluster Autoscaler to v1.30.2
 - CT Upg: Upgrade Karpenter to 0.37.3
-- Remove oidc.properties.subst from PingFederate and use environment variables
 - Adding FluentBit timestamp to standard log data for all log streams
+- Upgrade nginx-ingress-controller to v1.11.2 and SigSci agent to 4.57.0
+- Upgrade cert-manager to v1.16.1
+- Upgrade Argocd to v2.12.4
+- Upgrade Kubectl to v1.30.4
+- Add p1as-self-service microservice
+- Remove Thanos resources and use Prometheus standalone
 
 _Changes:_
 
 - [X] PDO-5729 Update version regexes
 - [X] PDO-5888 Implement p1as-pingdirectory pipeline deploy stage
 - [X] PDO-5900 Add p1as-pingdirectory code-gen directory to PCB
+- [X] PDO-5901 Pingdirectory Monorepo Cleanup
 - [X] PDO-6511 Update static files in PF upgrade to v12.1.0 
 - [X] PDO-6573 Support customer bringing their own certificate for their external server and adding it to PingDataSync truststore
 - [X] PDO-6744 Refactor update and generate scripts to pull from microservice repo mirrors
@@ -46,22 +51,43 @@ _Changes:_
 - [X] PDO-7456 CT Upg: Upgrade Karpenter to 0.37.3
 - [X] PDO-7469 De-duplicate prod-values.yaml
 - [X] PDO-7482 Reorganize fluentbit configuration
+- [X] PDO-7485 Fluentbit: Revisit CICD integration test
 - [X] PDO-7527 Grafana: Update PGO dashboards to be compatible with the current PGO version
 - [X] PDO-7564 Update number of shards for ingress index
 - [X] PDO-7608 Making Graviton as default for NON-GA environment, fix GA consistency across envs
-- [X] PDO-7669 Thanos: Storage Gateway crashlooping with OOM killed when choosing old range of data on Prometheus/Grafana UI
-- [X] PDO-7671 Thanos: Compactor is erroring with not enough ephemeral-storage
-- [X] PDO-7672 Thanos: Metrics older than 15 days are still present
 - [X] PDO-7683 Enable runtime bulkhead via API for PingFederate
+- [X] PDO-7717 Upgrade cert-manager to v1.16.1
+- [X] PDO-7738 Upgrade kubectl to v1.30.4
 - [X] PDO-8085 Restrict PingFederate and PingAccess heartbeat response
 - [X] PDO-8121 log4j2.xml.subst root logger follows PF_DEBUG_LEVEL
-- [X] PDO-8135 PingFederate SSO container set environment variables instead of .conf .property files
 - [X] PDO-8150 Improve Stability and Shutdown Handling
+- [X] PDO-8158 Add p1as-self-service microservice
 - [X] PDO-8193 Microservices profile repo feature branch testing fix
 - [X] PDO-8194 Upgrade External DNS to v0.14.2
 - [X] PDO-8212 Add teleport for cluster access
 - [X] PDO-8363 OpenSearch: Add the Fluent Bit ingestion time field
+- [X] PDO-8144 Upgrade nginx-ingress-controller to v1.11.2 and SigSci agent to 4.57.0
+- [X] PDO-8373 Upgrade Argocd to v2.12.4
+- [X] PDO-8418 Create and add TLS roles to PingOne
+- [X] PDO-8788 Thanos: Disable in 2.0 Release
+
+### 1.19.2.0
+
+_Changes:_
+
+- [X] PDO-7195 Alert when the PF connection to the datastore is lost or fails
+- [X] PDO-7765 Cost savings: Savings for 2.0.0 observability stack customer-hub
 - [X] PDO-8196 Include the Fluent Bit ingestion time field in the customer pipeline
+- [X] PDO-8355 Cronjob delete Job and PersistentVolumeClaim resources for PingDirectory backups
+- [X] PDO-8356 OpenSearch: Increase SC1 (warm) volume size
+- [X] PDO-8362 OpenSearch: Add app_timestamp field
+- [X] PDO-8363 OpenSearch: Add the Fluent Bit ingestion time field
+- [X] PDO-8404 Integrate Logstash and OpenSearch Config into container Image
+- [X] PDO-8730 Prevent customer-p1-connection job from running on upgrades
+- [X] PDO-8737 Force PingDirectory backup to run once at a time
+- [X] PDO-8783 Set AsyncRoot level to "INFO" in PF log4j2.xml file
+- [X] PDO-8825 Prometheus: Drop unused metrics
+- [X] PDO-8843 FluentBit: Fix multiline parsing config for certain logs
 
 ### 1.19.1.0
 

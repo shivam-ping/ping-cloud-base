@@ -108,11 +108,11 @@
 #                                  | will be a subset of SUPPORTED_ENVIRONMENT_TYPES    |
 #                                  |                                                    |
 # EXTERNAL_INGRESS_ENABLED         | List of ping apps(pingaccess pingaccess-was        | No defaults
-#                                  | pingdirectory pingdelegator pingfederate) for      |
-#                                  | which you can enable external ingress(the values   |
-#                                  | are ping app names)                                |
-#                                  | Examplelist:"pingaccess pingdirectory pingfederate |
-#                                  | pingaccess-was pingdelegator"                      |
+#                                  | pingdelegator pingfederate) for which you can      |
+#                                  | enable external ingress(the values are ping app    |
+#                                  | names)                                             |
+#                                  | Examplelist:"pingaccess pingfederate pingdelegator |
+#                                  | pingaccess-was              "                      |
 #                                  |                                                    |
 # GLOBAL_TENANT_DOMAIN             | Region-independent URL used for DNS failover/      | Replaces the first segment of
 #                                  | routing.                                           | the TENANT_DOMAIN value with the
@@ -191,7 +191,7 @@
 # CUSTOMER_SSO_SSM_PATH_PREFIX     | The prefix of an SSM path that contains PingOne    | ${CUSTOMER_SSM_PATH_PREFIX}/sso
 #                                  | state data required for the P14C/P1AS integration. |
 #                                  |                                                    |
-# CUSTOMER_TLS_SSM_PATH_PREFIX | The prefix of a Secrets Manager path that contains | ${CUSTOMER_SSM_PATH_PREFIX}/tls
+# CUSTOMER_TLS_SSM_PATH_PREFIX     | The prefix of a Secrets Manager path that contains | ${CUSTOMER_SSM_PATH_PREFIX}/tls
 #                                  | TLS state data.                                    |
 #                                  |                                                    |
 # PF_PROVISIONING_ENABLED          | Feature Flag - Indicates if the outbound           | False
@@ -278,8 +278,11 @@
 #                                  | must also be provided and correspond to this       |
 #                                  | public key.                                        |
 #                                  |                                                    |
-# STAGE                            | The environment's "stage".                         | lab 
-#                                  | Lab/Preview/GA/Field/etc|                          |
+# STAGE                            | The environment's "stage".                         | lab-us1
+#                                  | Lab/Preview/GA/Field/etc                           |
+#                                  | It is initially set by Versent as stage-region -   |
+#                                  | for example: ga-us1, then we consume only the      |
+#                                  | portion containing the stage in this script        |
 #                                  |                                                    |
 # SUPPORTED_ENVIRONMENT_TYPES      | The environment types that will be supported for   | dev test stage prod customer-hub
 #                                  | the customer                                       |
@@ -303,8 +306,6 @@
 #                                  | provided, this value will be used for the cluster  | value. E.g. it will default to "ci-cd"
 #                                  | name and must have the correct case (e.g. ci-cd    | for tenant domain "ci-cd.ping-oasis.com"
 #                                  | vs. CI-CD).                                        |
-#                                  |                                                    |
-# THANOS_S3_BUCKET_NAME            | Name of the thanos bucket                          | Empty string
 #                                  |                                                    |
 # UPGRADE                          | Indicates generate-cluster-state.sh is running as  | The string "false"
 #                                  | an upgrade not an initial generation               |
@@ -429,12 +430,14 @@ ${PINGCENTRAL_IMAGE_TAG}
 ${PINGACCESS_IMAGE_TAG}
 ${PINGACCESS_WAS_IMAGE_TAG}
 ${PINGFEDERATE_IMAGE_TAG}
-${PINGDIRECTORY_IMAGE_TAG}
 ${PINGDELEGATOR_IMAGE_TAG}
+${OPENSEARCH_BOOTSTRAP_IMAGE_TAG}
+${LOGSTASH_IMAGE_TAG}
 ${IRSA_PING_ANNOTATION_KEY_VALUE}
 ${IRSA_PA_ANNOTATION_KEY_VALUE}
 ${IRSA_PD_ANNOTATION_KEY_VALUE}
 ${IRSA_PF_ANNOTATION_KEY_VALUE}
+${IRSA_SS_ANNOTATION_KEY_VALUE}
 ${IRSA_ARGOCD_ANNOTATION_KEY_VALUE}
 ${IRSA_INGRESS_ANNOTATION_KEY_VALUE}
 ${IRSA_CWAGENT_ANNOTATION_KEY_VALUE}
@@ -442,7 +445,6 @@ ${IRSA_LOGSTASH_ANNOTATION_KEY_VALUE}
 ${IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE}
 ${IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE}
 ${IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE}
-${IRSA_THANOS_ANNOTATION_KEY_VALUE}
 ${IRSA_CLUSTER_AUTOSCALER_KEY_VALUE}
 ${KARPENTER_ROLE_ANNOTATION_KEY_VALUE}
 ${NLB_NGX_PUBLIC_ANNOTATION_KEY_VALUE}
@@ -461,7 +463,6 @@ ${DASH_REPO_URL}
 ${DASH_REPO_BRANCH}
 ${APP_RESYNC_SECONDS}
 ${CERT_RENEW_BEFORE}
-${THANOS_S3_BUCKET_NAME}
 ${TELEPORT_RESOURCE_ID}
 ${STAGE}'
 
@@ -753,11 +754,11 @@ echo "Initial IRSA_PING_ANNOTATION_KEY_VALUE: ${IRSA_PING_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_PA_ANNOTATION_KEY_VALUE: ${IRSA_PA_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_PD_ANNOTATION_KEY_VALUE: ${IRSA_PD_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_PF_ANNOTATION_KEY_VALUE: ${IRSA_PF_ANNOTATION_KEY_VALUE}"
+echo "Initial IRSA_SS_ANNOTATION_KEY_VALUE: ${IRSA_SS_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_ARGOCD_ANNOTATION_KEY_VALUE: ${IRSA_ARGOCD_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_CWAGENT_ANNOTATION_KEY_VALUE: ${IRSA_CWAGENT_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_LOGSTASH_ANNOTATION_KEY_VALUE: ${IRSA_LOGSTASH_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE: ${IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE}"
-echo "Initial IRSA_THANOS_ANNOTATION_KEY_VALUE: ${IRSA_THANOS_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_CLUSTER_AUTOSCALER_KEY_VALUE: ${IRSA_CLUSTER_AUTOSCALER_KEY_VALUE}"
 echo "Initial IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE: ${IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE}"
 echo "Initial IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE: ${IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE}"
@@ -819,7 +820,11 @@ export PRIMARY_REGION="${PRIMARY_REGION:-${REGION}}"
 PRIMARY_TENANT_DOMAIN_NO_DOT_SUFFIX="${PRIMARY_TENANT_DOMAIN%.}"
 export PRIMARY_TENANT_DOMAIN="${PRIMARY_TENANT_DOMAIN_NO_DOT_SUFFIX:-${TENANT_DOMAIN_NO_DOT_SUFFIX}}"
 export SECONDARY_TENANT_DOMAINS="${SECONDARY_TENANT_DOMAINS}"
-export STAGE="${STAGE:-lab}"
+
+# Default stage to lab-us1
+STAGE="${STAGE:-lab-us1}"
+# Versent passes STAGE as "stage-region" (e.g. "ga-us1") so we need to strip the region suffix
+export STAGE="${STAGE%%-*}"
 
 if "${IS_BELUGA_ENV}"; then
   DERIVED_GLOBAL_TENANT_DOMAIN="global.${TENANT_DOMAIN_NO_DOT_SUFFIX}"
@@ -868,18 +873,17 @@ export ACCOUNT_BASE_PATH=${ACCOUNT_BASE_PATH:-ssm://pcpt/config/k8s-config/accou
 export ACCOUNT_PATH_PREFIX=${ACCOUNT_BASE_PATH#ssm:/}
 export IRSA_BASE_PATH=${IRSA_BASE_PATH:-ssm://pcpt/irsa-role/}
 export PGO_BUCKET_URI_SUFFIX=${PGO_BUCKET_URI_SUFFIX:-/pgo-bucket/uri}
-export THANOS_BUCKET_URI_SUFFIX=${THANOS_BUCKET_URI_SUFFIX:-/service/storage/thanos/uri}
 
 # IRSA for ping product pods. The role name is predefined as a part of the interface contract.
 export IRSA_PING_ANNOTATION_KEY_VALUE=${IRSA_PING_ANNOTATION_KEY_VALUE:-''}
 export IRSA_PA_ANNOTATION_KEY_VALUE=${IRSA_PA_ANNOTATION_KEY_VALUE:-''}
 export IRSA_PD_ANNOTATION_KEY_VALUE=${IRSA_PD_ANNOTATION_KEY_VALUE:-''}
 export IRSA_PF_ANNOTATION_KEY_VALUE=${IRSA_PF_ANNOTATION_KEY_VALUE:-''}
+export IRSA_SS_ANNOTATION_KEY_VALUE=${IRSA_SS_ANNOTATION_KEY_VALUE:-''}
 export IRSA_ARGOCD_ANNOTATION_KEY_VALUE=${IRSA_ARGOCD_ANNOTATION_KEY_VALUE:-''}
 export IRSA_CWAGENT_ANNOTATION_KEY_VALUE=${IRSA_CWAGENT_ANNOTATION_KEY_VALUE:-''}
 export IRSA_LOGSTASH_ANNOTATION_KEY_VALUE=${IRSA_LOGSTASH_ANNOTATION_KEY_VALUE:-''}
 export IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE=${IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE:-''}
-export IRSA_THANOS_ANNOTATION_KEY_VALUE=${IRSA_THANOS_ANNOTATION_KEY_VALUE:-''}
 export IRSA_CLUSTER_AUTOSCALER_KEY_VALUE=${IRSA_CLUSTER_AUTOSCALER_KEY_VALUE:-''}
 export IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE=${IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE:-''}
 export IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE=${IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE:-''}
@@ -1065,11 +1069,11 @@ echo "Using IRSA_PING_ANNOTATION_KEY_VALUE: ${IRSA_PING_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_PA_ANNOTATION_KEY_VALUE: ${IRSA_PA_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_PD_ANNOTATION_KEY_VALUE: ${IRSA_PD_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_PF_ANNOTATION_KEY_VALUE: ${IRSA_PF_ANNOTATION_KEY_VALUE}"
+echo "Using IRSA_SS_ANNOTATION_KEY_VALUE: ${IRSA_SS_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_ARGOCD_ANNOTATION_KEY_VALUE: ${IRSA_ARGOCD_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_CWAGENT_ANNOTATION_KEY_VALUE: ${IRSA_CWAGENT_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_LOGSTASH_ANNOTATION_KEY_VALUE: ${IRSA_LOGSTASH_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE: ${IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE}"
-echo "Using IRSA_THANOS_ANNOTATION_KEY_VALUE: ${IRSA_THANOS_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_CLUSTER_AUTOSCALER_KEY_VALUE: ${IRSA_CLUSTER_AUTOSCALER_KEY_VALUE}"
 echo "Using IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE: ${IRSA_CERT_MANAGER_ANNOTATION_KEY_VALUE}"
 echo "Using IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE: ${IRSA_EXTERNAL_DNS_ANNOTATION_KEY_VALUE}"
@@ -1138,8 +1142,6 @@ cp ../.gitignore "${PROFILE_REPO_DIR}"
 
 echo "${PING_CLOUD_BASE_COMMIT_SHA}" > "${TARGET_DIR}/pcb-commit-sha.txt"
 
-set_var "THANOS_S3_BUCKET_NAME" "" "${ACCOUNT_BASE_PATH}customer-hub" "${THANOS_BUCKET_URI_SUFFIX}"
-export THANOS_S3_BUCKET_NAME="${THANOS_S3_BUCKET_NAME#s3://}"
 
 # The SUPPORTED_ENVIRONMENT_TYPES variable can either be the CDE names (e.g. dev, test, stage, prod) or the CHUB name "customer-hub",
 # or the corresponding branch names (e.g. v1.8.0-dev, v1.8.0-test, v1.8.0-stage, v1.8.0-master, v1.8.0-customer-hub).
@@ -1269,10 +1271,10 @@ for ENV_OR_BRANCH in ${SUPPORTED_ENVIRONMENT_TYPES}; do
   set_var "IRSA_PA_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/pingaccess/arn" "${IRSA_TEMPLATE}"
   set_var "IRSA_PD_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/pingdirectory/arn" "${IRSA_TEMPLATE}"
   set_var "IRSA_PF_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/pingfederate/arn" "${IRSA_TEMPLATE}"
+  set_var "IRSA_SS_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/self-service/arn" "${IRSA_TEMPLATE}"
   set_var "IRSA_CWAGENT_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/cloudwatch-agent/arn" "${IRSA_TEMPLATE}"
   set_var "IRSA_LOGSTASH_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/logstash/arn" "${IRSA_TEMPLATE}"
   set_var "IRSA_OPENSEARCH_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/opensearch/arn" "${IRSA_TEMPLATE}"
-  set_var "IRSA_THANOS_ANNOTATION_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/thanos/arn" "${IRSA_TEMPLATE}"
   set_var "IRSA_CLUSTER_AUTOSCALER_KEY_VALUE" "" "${ACCOUNT_BASE_PATH}" "${ENV}/irsa-role/cluster-autoscaler/arn" "${IRSA_TEMPLATE}"
   # ArgoCD only for customer-hub
   set_var "IRSA_ARGOCD_ANNOTATION_KEY_VALUE" "" "${IRSA_BASE_PATH}" "irsa-argocd/arn" "${IRSA_TEMPLATE}"
