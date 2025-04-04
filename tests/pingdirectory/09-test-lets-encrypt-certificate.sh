@@ -30,7 +30,7 @@ openssl crl2pkcs7 -nocrl -certfile /tmp/cluster-certificate.crt \
     | openssl pkcs7 -print_certs -text -noout
 
 # Compare certs
-echo "🔍 Comparing Cluster Cert with Keystore Cert..."
+echo "Comparing Cluster Cert with Keystore Cert..."
 if cmp -s /tmp/cluster-certificate.crt /opt/server-cert-keystore.crt; then
     echo "Cluster cert matches Keystore cert"
 else
