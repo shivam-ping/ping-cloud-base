@@ -2,10 +2,10 @@
 
 set -e
 
-echo "🔍 Test: Verify Let's Encrypt Certificate in PingDirectory Keystore and TrustStore"
+echo "Test: Verify Let's Encrypt Certificate in PingDirectory Keystore and TrustStore"
 
 NAMESPACE="ping-cloud"
-POD_NAME=$(kubectl get pods -n $NAMESPACE -l app.kubernetes.io/name=pingdirectory-0 -o jsonpath="{.items[0].metadata.name}")
+POD_NAME="pingdirectory-0"
 
 echo "Exporting keystore certificate from PingDirectory pod..."
 kubectl exec -n $NAMESPACE $POD_NAME -- \
@@ -29,15 +29,15 @@ kubectl exec -n $NAMESPACE $POD_NAME -- \
 
 kubectl cp $NAMESPACE/$POD_NAME:/tmp/server-cert-truststore.crt /opt/server-cert-truststore.crt
 
-echo "🔐 Fetching Let's Encrypt certificate from Kubernetes secret..."
+echo "Fetching Let's Encrypt certificate from Kubernetes secret..."
 kubectl get secret acme-tls-cert -n $NAMESPACE \
     -o jsonpath='{.data.tls\.crt}' | base64 --decode > /tmp/cluster-certificate.crt
 
-echo "📜 Cluster certificate details:"
+echo "Cluster certificate details:"
 openssl crl2pkcs7 -nocrl -certfile /tmp/cluster-certificate.crt \
     | openssl pkcs7 -print_certs -text -noout || true
 
-echo "🧪 Comparing Cluster Cert with Keystore Cert..."
+echo "Comparing Cluster Cert with Keystore Cert..."
 if cmp -s /tmp/cluster-certificate.crt /opt/server-cert-keystore.crt; then
     echo "Cluster cert matches Keystore cert"
 else
@@ -45,7 +45,7 @@ else
     exit 1
 fi
 
-echo "🧪 Comparing Cluster Cert with Truststore Cert..."
+echo "Comparing Cluster Cert with Truststore Cert..."
 if cmp -s /tmp/cluster-certificate.crt /opt/server-cert-truststore.crt; then
     echo "Cluster cert matches Truststore cert"
 else
