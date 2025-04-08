@@ -10,7 +10,7 @@ POD_NAME="pingdirectory-0"
 echo "Exporting keystore certificate from PingDirectory pod..."
 kubectl exec -n $NAMESPACE $POD_NAME -- \
     manage-certificates export-certificate \
-    --keystore config/keystore \
+    --keystore /opt/out/instance/config/keystore \ \
     --keystore-password-file config/keystore.pin \
     --alias server-cert \
     --output-file /tmp/server-cert-keystore.crt \
@@ -21,7 +21,7 @@ kubectl cp $NAMESPACE/$POD_NAME:/tmp/server-cert-keystore.crt /opt/server-cert-k
 echo "Exporting truststore certificate from PingDirectory pod..."
 kubectl exec -n $NAMESPACE $POD_NAME -- \
     manage-certificates export-certificate \
-    --keystore config/truststore \
+    --keystore /opt/out/instance/config/truststore \
     --keystore-password-file config/truststore.pin \
     --alias server-cert \
     --output-file /tmp/server-cert-truststore.crt \
