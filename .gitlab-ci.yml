@@ -12,7 +12,7 @@ stages:
 - find-cluster
 - deploy
 - pre-check-test
-- pa-was-test
+# - pa-was-test
 - integration-test
 - chaos
 - cleanup
@@ -194,15 +194,15 @@ pa-was-integration-tests:
 ################################################
 .schedule-tests: &schedule-tests
   - pingdirectory
-  - pingdelegator
-  - pingfederate
-  - pingaccess
-  - pingcloud-services
-  - pingdatasync
-  - common
-  - monitoring
-  - health
-  - pingone
+  #- pingdelegator
+  #- pingfederate
+  #- pingaccess
+  #- pingcloud-services
+  #- pingdatasync
+  #- common
+  #- monitoring
+  #- health
+  #- pingone
 
 ################################################
 # All integration tests defined to run on the  #

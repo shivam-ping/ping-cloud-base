@@ -8,10 +8,10 @@ NAMESPACE="ping-cloud"
 POD_NAME="pingdirectory-0"
 
 echo "Exporting keystore certificate from PingDirectory pod..."
-kubectl exec -n $NAMESPACE $POD_NAME -- \
-    manage-certificates export-certificate \
+kubectl exec -n $NAMESPACE $POD_NAME -- manage-certificates  \
+    export-certificate \
     --keystore /opt/out/instance/config/keystore \ \
-    --keystore-password-file config/keystore.pin \
+    --keystore-password-file /opt/out/instance/config/keystore.pin \
     --alias server-cert \
     --output-file /tmp/server-cert-keystore.crt \
     --output-format PEM --verbose
@@ -19,10 +19,10 @@ kubectl exec -n $NAMESPACE $POD_NAME -- \
 kubectl cp $NAMESPACE/$POD_NAME:/tmp/server-cert-keystore.crt /opt/server-cert-keystore.crt
 
 echo "Exporting truststore certificate from PingDirectory pod..."
-kubectl exec -n $NAMESPACE $POD_NAME -- \
-    manage-certificates export-certificate \
+kubectl exec -n $NAMESPACE $POD_NAME -- manage-certificates \
+    export-certificate \
     --keystore /opt/out/instance/config/truststore \
-    --keystore-password-file config/truststore.pin \
+    --keystore-password-file /opt/out/instance/config/truststore.pin \
     --alias server-cert \
     --output-file /tmp/server-cert-truststore.crt \
     --output-format PEM --verbose
