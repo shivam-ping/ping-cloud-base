@@ -156,6 +156,34 @@ spec:
           subPath: perpetual_license.py
         - name: license-dir
           mountPath: /opt/license
+      - name: download-ik
+        image: public.ecr.aws/r2h3l6e4/pingcloud-services/toolkit:v1.22.0
+        command:
+          - sh
+          - -c
+          - |
+            initialize_env() {
+              echo "[$(date +"%T")] Running inline init…" >&2
+              # e.g. create a marker for the main container
+              touch /workdir/initialized.flag
+            }
+            if ! isPingaccessWas; then
+              create_artifact_directories && download_artifacts_within_tmp
+              if test $? -ne 0; then
+                exit 1
+              fi
+
+              copy_artifacts_from_tmp "${SERVER_ROOT_DIR}"
+            fi
+
+            # invoke it
+            initialize_env
+        envFrom:
+        - configMapRef:
+            name: pingaccess-environment-variables
+        volumeMounts:
+        - name: out-dir
+          mountPath: /opt/out
       containers:
       - name: pingaccess
         image: public.ecr.aws/r2h3l6e4/pingcloud-apps/pingaccess/dev:v2.1-release-branch-latest
