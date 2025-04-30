@@ -168,6 +168,13 @@ spec:
         envFrom:
         - configMapRef:
             name: pingaccess-admin-environment-variables
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "256Mi"
+          limits:
+            cpu: "1"
+            memory: "512Mi"
         volumeMounts:
         - name: out-dir
           mountPath: /opt/out
