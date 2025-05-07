@@ -152,6 +152,343 @@ spec:
           subPath: perpetual_license.py
         - name: license-dir
           mountPath: /opt/license
+      - name: download-ik
+        image: public.ecr.aws/r2h3l6e4/pingcloud-services/toolkit:v1.22.0
+        command:
+          - sh
+          - -c
+          - |
+            ########################################################################################################################
+            # Function to check if container is pingaccess-was
+            #
+            ########################################################################################################################
+            isPingaccessWas() {
+              test "${K8S_STATEFUL_SET_NAME}" = "pingaccess-was-admin"
+            }
+
+            ########################################################################################################################
+            # Create artifact directories. This will be global so the 10-start-sequence.sh.pre, 20-restart-sequence.sh.pre,
+            # and 22-upgrade-server.sh scripts can use.
+            # TODO: We will need to remove from the main container w/in utils.lib.sh
+            ########################################################################################################################
+            create_artifact_directories() {
+              export ARTIFACT_DOWNLOAD_DIR=$(mktemp -d)
+              export ARTIFACT_UNZIP_DOWNLOAD_DIR=$(mktemp -d)
+              export_container_env ARTIFACT_DOWNLOAD_DIR ARTIFACT_UNZIP_DOWNLOAD_DIR
+            }
+
+            ########################################################################################################################
+            # Download artifacts from s3 into /tmp directories ARTIFACT_DOWNLOAD_DIR and ARTIFACT_UNZIP_DOWNLOAD_DIR.
+            # TODO: We will need to remove from the main container w/in utils.lib.sh
+            ########################################################################################################################
+            download_artifacts_within_tmp() {
+              if test -f "${STAGING_DIR}/artifacts/artifact-list.json"; then
+                # Check to see if the artifact file is empty
+                ARTIFACT_LIST_JSON=$(cat "${STAGING_DIR}/artifacts/artifact-list.json")
+                if test ! -z "${ARTIFACT_LIST_JSON}"; then
+                  # Check to see if the source is specified
+                  if test ! -z "${ARTIFACT_REPO_URL}"; then
+
+                    beluga_log "Private Repo : ${ARTIFACT_REPO_URL}"
+
+                    # Check to see if the artifact list is a valid json string
+                    beluga_log "${ARTIFACT_LIST_JSON}"
+                    if test $(echo ${ARTIFACT_LIST_JSON} | jq >/dev/null 2>&1; echo $?) == "0"; then
+
+                      DIRECTORY_NAME=$(echo ${PING_PRODUCT} | tr '[:upper:]' '[:lower:]')
+
+                      PRIVATE_BASE_URL="${ARTIFACT_REPO_URL}"
+                      if test ! -z "${ARTIFACT_REPO_URL}"; then
+                        if ! test -z "${ARTIFACT_REPO_URL##*/pingaccess*}"; then
+                          PRIVATE_BASE_URL="${ARTIFACT_REPO_URL}/${DIRECTORY_NAME}"
+                        fi
+                      fi
+
+                      for artifact in $(echo "${ARTIFACT_LIST_JSON}" | jq -c '.[]'); do
+                        _artifact() {
+                          echo ${artifact} | jq -r ${1}
+                        }
+
+                        ARTIFACT_NAME=$(_artifact '.name')
+                        ARTIFACT_VERSION=$(_artifact '.version')
+                        ARTIFACT_SOURCE=$(_artifact '.source')
+                        ARTIFACT_OPERATION=$(_artifact '.operation')
+                        ARTIFACT_RUNTIME_ZIP=${ARTIFACT_NAME}-${ARTIFACT_VERSION}-runtime.zip
+
+                        # Use default source of private if source is not specified
+                        if ( ( test "${ARTIFACT_SOURCE}" == "null" ) || ( test -z ${ARTIFACT_SOURCE} ) ); then
+                          ARTIFACT_SOURCE="private"
+                        fi
+
+                        # Use default operation of add if operation is not specified
+                        if ( ( test "${ARTIFACT_OPERATION}" == "null" ) || ( test -z ${ARTIFACT_OPERATION} ) ); then
+                          ARTIFACT_OPERATION="add"
+                        fi
+
+                        # Check to see if artifact name and version are available
+                        if ( ( test ! "${ARTIFACT_NAME}" == "null" ) && ( test ! -z ${ARTIFACT_NAME} ) ); then
+                          if ( ( test ! "${ARTIFACT_VERSION}" == "null" ) && ( test ! -z ${ARTIFACT_VERSION} ) ); then
+
+                            # Check to see if the Artifact Source URL is available
+                            if ( ( test "${ARTIFACT_SOURCE}" == "private" ) && ( test -z ${ARTIFACT_REPO_URL} ) ); then
+                              beluga_error "${ARTIFACT_NAME} cannot be deployed as the ${ARTIFACT_SOURCE} source repo is not defined. "
+                              return 1
+                            else
+                              # Make sure there aren't any duplicate entries for the artifact.
+                              # This is needed to avoid issues with multiple plugin versions
+                              ARTIFACT_NAME_COUNT=$(echo "${ARTIFACT_LIST_JSON}" | grep -iEo "${ARTIFACT_NAME}" | wc -l | xargs)
+
+                              if test "${ARTIFACT_NAME_COUNT}" == "1"; then
+
+                                # Get artifact source location
+                                if test "${ARTIFACT_SOURCE}" == "private"; then
+                                  ARTIFACT_LOCATION=${PRIVATE_BASE_URL}/${ARTIFACT_NAME}/${ARTIFACT_VERSION}/${ARTIFACT_RUNTIME_ZIP}
+                                else
+                                  beluga_error "${ARTIFACT_NAME} cannot be deployed as the artifact source '${ARTIFACT_SOURCE}' is invalid. "
+                                  return 1
+                                fi
+
+                                beluga_log "Download Artifact from ${ARTIFACT_LOCATION}"
+
+                                # Use aws cli command if ARTIFACT_LOCATION is in s3 format otherwise use curl
+                                if ! test ${ARTIFACT_LOCATION#s3} == "${ARTIFACT_LOCATION}"; then
+
+                                  # Set required environment variables for aws cli
+                                  belugacommon_initializeS3Configuration "${ARTIFACT_LOCATION}"
+
+                                  beluga_log "Copying: '${ARTIFACT_RUNTIME_ZIP}' to '${ARTIFACT_DOWNLOAD_DIR}'"
+
+                                  if ! belugacommon_awscliCopy "${BACKUP_CLOUD_PREFIX}" "${ARTIFACT_DOWNLOAD_DIR}/${ARTIFACT_RUNTIME_ZIP}"; then
+                                    beluga_error "Failed to copy ${ARTIFACT_RUNTIME_ZIP}"
+                                    return 1
+                                  fi
+
+                                else
+                                  curl -sS "${ARTIFACT_LOCATION}" --output ${ARTIFACT_DOWNLOAD_DIR}/${ARTIFACT_RUNTIME_ZIP}
+                                fi
+
+                                if test $(echo $?) == "0"; then
+
+                                  # Unzip artifact plugin
+                                  if ! unzip -o ${ARTIFACT_DOWNLOAD_DIR}/${ARTIFACT_RUNTIME_ZIP} -d ${ARTIFACT_UNZIP_DOWNLOAD_DIR}/${ARTIFACT_NAME}; then
+                                      beluga_error Artifact ${ARTIFACT_DOWNLOAD_DIR}/${ARTIFACT_RUNTIME_ZIP} could not be unzipped.
+                                      return 1
+                                  fi
+
+                                  # Validate /deploy directory is included in the zip and the artifact jar
+                                  ! test -d ${ARTIFACT_UNZIP_DOWNLOAD_DIR}/${ARTIFACT_NAME}/deploy && beluga_error "Artifact required deploy directory could not be found." && return 1
+                                  ! test -f ${ARTIFACT_UNZIP_DOWNLOAD_DIR}/${ARTIFACT_NAME}/deploy/*jar && beluga_error "Artifact required jar file could not be found." && return 1
+
+                                  # Extend the permissions of all detected jars
+                                  find ${ARTIFACT_UNZIP_DOWNLOAD_DIR} -name *.jar -exec chmod 777 {} \;
+
+                                  beluga_log "Artifact ${ARTIFACT_RUNTIME_ZIP} successfully downloaded"
+                                else
+                                  beluga_error "Artifact download failed from ${ARTIFACT_LOCATION}"
+                                  return 1
+                                fi
+
+                              else
+                                beluga_error "Artifact ${ARTIFACT_NAME} is specified more than once in ${STAGING_DIR}/artifacts/artifact-list.json"
+                                return 1
+                              fi
+                            fi
+                          else
+                            beluga_error "Artifact Version for ${ARTIFACT_NAME} could not be retrieved from ${STAGING_DIR}/artifacts/artifact-list.json"
+                            return 1
+                          fi
+                        else
+                          beluga_error "Missing Artifact Name within ${STAGING_DIR}/artifacts/artifact-list.json"
+                          return 1
+                        fi
+
+                      done
+
+                    else
+                      beluga_error "Artifacts will not be deployed as could not parse ${STAGING_DIR}/artifacts/artifact-list.json."
+                      return 1
+                    fi
+                  else
+                    beluga_warn "Artifacts will not be deployed as the environment variable ARTIFACT_REPO_URL and PING_ARTIFACT_REPO_URL are empty."
+                    return 0
+                  fi
+                else
+                  beluga_warn "Artifacts will not be deployed as ${STAGING_DIR}/artifacts/artifact-list.json is empty."
+                  return 0
+                fi
+              else
+                beluga_warn "Artifacts will not be deployed as ${STAGING_DIR}/artifacts/artifact-list.json doesn't exist."
+                return 0
+              fi
+            }
+
+            ########################################################################################################################
+            # Copy artifacts from /tmp directory ARTIFACT_UNZIP_DOWNLOAD_DIR into desired server instance.
+            #
+            # Arguments
+            #   $1 -> Desired server instance.
+            # TODO: We will need to remove from the main container w/in utils.lib.sh
+            # TODO: We can also remove cleanup_artifacts method w/in utils.lib.sh
+            ########################################################################################################################
+            copy_artifacts_from_tmp() {
+              server_instance=${1}
+
+              # Create directory if it doesn't exist
+              mkdir -p "${server_instance}"/deploy
+
+              # Ensure directory is clean if it did exist
+              rm -fr "${server_instance}"/deploy/*
+
+              ARTIFACT_LIST_JSON=$(cat "${STAGING_DIR}/artifacts/artifact-list.json")
+
+              # If exist remove any previous versions of artifact plugin
+              for artifact in $(echo "${ARTIFACT_LIST_JSON}" | jq -c '.[]'); do
+                _artifact() {
+                  echo ${artifact} | jq -r ${1}
+                }
+
+                ARTIFACT_NAME=$(_artifact '.name')
+
+                # Deploy artifact plugin to server
+                cp -prf ${ARTIFACT_UNZIP_DOWNLOAD_DIR}/${ARTIFACT_NAME}/* ${server_instance}
+              done
+
+              # Print listed files from deploy and conf to a single line so we don't spam logs
+              beluga_log "Artifacts successfully deployed within ${server_instance}"
+              ls ${server_instance}/deploy | xargs
+            }
+
+            create_mock_artifact_json() {
+            # Write (or overwrite) ${STAGING_DIR}/artifacts
+            cat <<'EOF' > ${STAGING_DIR}/artifacts/artifact-list.json
+            [
+              {
+                "name": "sample-rules",
+                "version": "6.0.2",
+                "source": "private"
+              },
+              {
+                "name": "sample-site-authenticators",
+                "version": "6.0.3",
+                "source": "private"
+              }
+            ]
+            EOF
+
+            # Print out file for testing purposes
+            cat ${STAGING_DIR}/artifacts/artifact-list.json
+            }
+
+
+            #########################################################################################################################
+            # Function sets required environment variables for backup
+            #
+            ########################################################################################################################
+            belugacommon_initializeS3Configuration() {
+              unset   BACKUP_CLOUD_PREFIX
+              local s3_bucket_url=
+
+              # Allow overriding the S3 bucket with an arg
+              if test ! -z "${1}"; then
+                s3_bucket_url="${1}"
+              else # Default to BACKUP_URL S3 bucket
+                s3_bucket_url="${BACKUP_URL}"
+              fi
+
+              local operation_type="${2:-"COMMON"}"
+
+              # Check if endpoint is AWS cloud storage service (S3 bucket)
+              case "${s3_bucket_url}" in "s3://"*)
+
+                # Set AWS specific variable for backup
+                export AWS_REGION=${REGION}
+
+                DIRECTORY_NAME=$(echo "${PING_PRODUCT}" | tr '[:upper:]' '[:lower:]')
+
+                if ! $(echo "${s3_bucket_url}" | grep -q "/$DIRECTORY_NAME"); then
+                  current_time=$(date +"%Y%m%d")
+                  case "$operation_type" in 
+                  "CSD")
+                      s3_bucket_url="${s3_bucket_url}/csd-logs/${DIRECTORY_NAME}/$current_time"
+                    ;;
+                  "MONITOR-LOGS")
+                      s3_bucket_url="${s3_bucket_url}/monitor-logs/${DIRECTORY_NAME}/$current_time"
+                    ;;
+                  "LDIF-EXPORT")
+                      s3_bucket_url="${s3_bucket_url}/ldif-exports/${DIRECTORY_NAME}/$current_time"
+                    ;;
+                  *)
+                      s3_bucket_url="${s3_bucket_url}/${DIRECTORY_NAME}"
+                    ;;
+                  esac
+                fi
+                ;;
+
+              esac
+
+              export BACKUP_CLOUD_PREFIX="${s3_bucket_url}"
+            }
+
+            ########################################################################################################################
+            # Function to copy file(s) between cloud storage and k8s
+            #
+            # Arguments
+            #   $1 -> desired source to copy from.
+            #   $2 -> desired destination to copy to.
+            #   s3 -> use recursion flag. will use recursion if any value is passed. if set will target all files in directory
+            ########################################################################################################################
+            belugacommon_awscliCopy() {
+              SOURCE="${1}"
+              DESTINATION="${2}"
+              RECURSIVE="${3}"
+
+              if [ -n "$RECURSIVE" ]; then
+                if ! aws s3 cp "$SOURCE" "${DESTINATION}" --recursive --only-show-errors; then
+                  return 1
+                fi
+              else
+                if ! aws s3 cp "$SOURCE" "${DESTINATION}" --only-show-errors; then
+                  return 1
+                fi
+              fi
+            }
+
+            beluga_log() {
+              echo "$1"
+            }
+
+            beluga_error() {
+              echo "$1"
+            }
+
+            beluga_warn() {
+              echo "$1"
+            }
+            if ! isPingaccessWas; then
+              # Mock artifact-list.json
+              STAGING_DIR=/opt/shared-dir/integration-kits
+              mkdir -p ${STAGING_DIR}/artifacts
+              create_mock_artifact_json
+              create_artifact_directories && download_artifacts_within_tmp
+              if test $? -ne 0; then
+                echo "Unexpected error when calling create_artifact_directories && download_artifacts_within_tmp"
+                exit 1
+              fi
+              copy_artifacts_from_tmp /opt/shared-dir/integration-kits
+            fi
+        envFrom:
+        - configMapRef:
+            name: pingaccess-admin-environment-variables
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "256Mi"
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+        volumeMounts:
+        - name: shared-dir
+          mountPath: /opt/shared-dir/integration-kits
       containers:
       - name: pingaccess-was
         image: public.ecr.aws/r2h3l6e4/pingcloud-apps/pingaccess-was/dev:v2.1-release-branch-latest
