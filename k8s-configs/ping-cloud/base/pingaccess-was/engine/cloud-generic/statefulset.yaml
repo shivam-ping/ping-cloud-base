@@ -174,7 +174,6 @@ spec:
             create_artifact_directories() {
               export ARTIFACT_DOWNLOAD_DIR=$(mktemp -d)
               export ARTIFACT_UNZIP_DOWNLOAD_DIR=$(mktemp -d)
-              export_container_env ARTIFACT_DOWNLOAD_DIR ARTIFACT_UNZIP_DOWNLOAD_DIR
             }
 
             ########################################################################################################################
