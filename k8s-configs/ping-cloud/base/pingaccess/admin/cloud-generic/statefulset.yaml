@@ -351,7 +351,7 @@ spec:
 
             create_mock_artifact_json() {
             # Write (or overwrite) ${STAGING_DIR}/artifacts
-            cat <<'EOF' > ${STAGING_DIR}/artifacts/artifact-list.json
+            cat <<EOF > ${STAGING_DIR}/artifacts/artifact-list.json
             [
               {
                 "name": "sample-rules",
