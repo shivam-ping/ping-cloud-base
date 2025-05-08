@@ -153,7 +153,8 @@ spec:
         - name: license-dir
           mountPath: /opt/license
       - name: download-ik
-        image: public.ecr.aws/r2h3l6e4/pingcloud-services/toolkit:v1.22.0
+        image: public.ecr.aws/r2h3l6e4/pingcloud-services/awscli-kubectl:v1.0.0
+        imagePullPolicy: IfNotPresent
         command:
           - sh
           - -c
