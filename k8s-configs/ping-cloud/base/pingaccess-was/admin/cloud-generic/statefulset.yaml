@@ -368,20 +368,7 @@ spec:
 
             create_mock_artifact_json() {
             # Write (or overwrite) ${STAGING_DIR}/artifacts
-            cat <<EOF > "${STAGING_DIR}/artifacts/artifact-list.json"
-            [
-              {
-                "name": "sample-rules",
-                "version": "6.0.2",
-                "source": "private"
-              },
-              {
-                "name": "sample-site-authenticators",
-                "version": "6.0.3",
-                "source": "private"
-              }
-            ]
-            EOF
+            echo '[{"name": "sample-rules", "version": "6.0.2", "source": "private"}, {"name": "sample-site-authenticators", "version": "6.0.3", "source": "private"}]' > ${STAGING_DIR}/artifacts/artifact-list.json
 
             # Print out file for testing purposes
             cat "${STAGING_DIR}/artifacts/artifact-list.json"
