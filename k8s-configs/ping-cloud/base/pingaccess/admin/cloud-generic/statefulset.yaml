@@ -351,7 +351,7 @@ spec:
 
             create_mock_artifact_json() {
             # Write (or overwrite) ${STAGING_DIR}/artifacts
-            cat <<EOF > ${STAGING_DIR}/artifacts/artifact-list.json
+            cat <<EOF > "${STAGING_DIR}/artifacts/artifact-list.json"
             [
               {
                 "name": "sample-rules",
@@ -367,9 +367,8 @@ spec:
             EOF
 
             # Print out file for testing purposes
-            cat ${STAGING_DIR}/artifacts/artifact-list.json
+            cat "${STAGING_DIR}/artifacts/artifact-list.json"
             }
-
 
             #########################################################################################################################
             # Function sets required environment variables for backup
@@ -457,8 +456,8 @@ spec:
             }
             if ! isPingaccessWas; then
               # Mock artifact-list.json
-              STAGING_DIR=/opt/shared-dir/integration-kits
-              mkdir -p ${STAGING_DIR}/artifacts
+              STAGING_DIR="/opt/shared-dir/integration-kits"
+              mkdir -p "${STAGING_DIR}/artifacts"
               create_mock_artifact_json
               create_artifact_directories && download_artifacts_within_tmp
               if test $? -ne 0; then
