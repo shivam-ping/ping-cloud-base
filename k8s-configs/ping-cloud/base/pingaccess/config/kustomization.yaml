@@ -11,6 +11,7 @@ resources:
 - secret-passwords.yaml
 - configmap-csd-upload.yaml
 - configmap-heartbeat-exporter.yaml
+- configmap-artifact-json.yaml
 
 generatorOptions:
   disableNameSuffixHash: true

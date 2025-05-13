@@ -358,14 +358,6 @@ spec:
               ls ${server_instance}/deploy | xargs
             }
 
-            create_mock_artifact_json() {
-            # Write (or overwrite) ${STAGING_DIR}/artifacts
-            echo '[{"name": "sample-rules", "version": "6.0.2", "source": "private"}, {"name": "sample-site-authenticators", "version": "6.0.3", "source": "private"}]' > ${STAGING_DIR}/artifacts/artifact-list.json
-
-            # Print out file for testing purposes
-            cat "${STAGING_DIR}/artifacts/artifact-list.json"
-            }
-
             #########################################################################################################################
             # Function sets required environment variables for backup
             #
@@ -450,11 +442,11 @@ spec:
             beluga_warn() {
               echo "$1"
             }
+            cat /opt/staging/artifacts/artifact-list.json
             if ! isPingaccessWas; then
               # Mock artifact-list.json
               STAGING_DIR="/opt/shared-dir/integration-kits"
               mkdir -p "${STAGING_DIR}/artifacts"
-              create_mock_artifact_json
               create_artifact_directories && download_artifacts_within_tmp
               if test $? -ne 0; then
                 echo "Unexpected error when calling create_artifact_directories && download_artifacts_within_tmp"
@@ -475,6 +467,8 @@ spec:
         volumeMounts:
         - name: shared-dir
           mountPath: /opt/shared-dir/integration-kits
+        - name: artifact-config
+          mountPath: /opt/staging/artifacts
       containers:
       - name: pingaccess-was
         image: public.ecr.aws/r2h3l6e4/pingcloud-apps/pingaccess-was/dev:v2.1-release-branch-latest
@@ -591,3 +585,6 @@ spec:
           secretName: pingaccess-was-passwords
           optional: true
           defaultMode: 0400
+      - name: artifact-config
+        configMap:
+          name: artifact-config
