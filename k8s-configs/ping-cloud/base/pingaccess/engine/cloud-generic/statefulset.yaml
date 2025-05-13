@@ -471,7 +471,7 @@ spec:
         volumeMounts:
         - name: shared-dir
           mountPath: /opt/shared-dir/integration-kits
-        - name: artifact-config
+        - name: pingaccess-artifact-config
           mountPath: /opt/staging/artifacts
       containers:
       - name: pingaccess
@@ -642,6 +642,6 @@ spec:
           name: pingaccess-admin-p14c
           optional: true
           defaultMode: 0400
-      - name: artifact-config
+      - name: pingaccess-artifact-config
         configMap:
-          name: artifact-config
+          name: pingaccess-artifact-config

@@ -458,7 +458,7 @@ spec:
         volumeMounts:
         - name: shared-dir
           mountPath: /opt/shared-dir/integration-kits
-        - name: artifact-config
+        - name: pingaccess-artifact-config
           mountPath: /opt/staging/artifacts
       - name: pingaccess-upgrade
         image: public.ecr.aws/r2h3l6e4/pingcloud-apps/pingaccess/dev:v2.1-release-branch-latest
@@ -717,9 +717,9 @@ spec:
           name: customer-issuer
           optional: true
           defaultMode: 0400
-      - name: artifact-config
+      - name: pingaccess-artifact-config
         configMap:
-          name: artifact-config
+          name: pingaccess-artifact-config
   volumeClaimTemplates:
   - metadata:
       name: out-dir

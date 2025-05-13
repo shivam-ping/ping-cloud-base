@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: artifact-config
+  name: pingaccess-artifact-config
 data:
   artifact-list.json: |
     [
