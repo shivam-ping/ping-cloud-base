@@ -452,15 +452,15 @@ spec:
             }
             cat /opt/staging/artifacts/artifact-list.json
             if ! isPingaccessWas; then
-              # Mock artifact-list.json
-              STAGING_DIR="/opt/shared-dir/integration-kits"
-              mkdir -p "${STAGING_DIR}/artifacts"
+              # Mock Staging directory
+              STAGING_DIR="/opt/staging"
               create_artifact_directories && download_artifacts_within_tmp
               if test $? -ne 0; then
                 echo "Unexpected error when calling create_artifact_directories && download_artifacts_within_tmp"
                 exit 1
               fi
               copy_artifacts_from_tmp /opt/shared-dir/integration-kits
+              ls /opt/shared-dir/integration-kits
             fi
         envFrom:
         - configMapRef:
